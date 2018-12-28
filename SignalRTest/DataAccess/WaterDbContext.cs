@@ -10,5 +10,12 @@ namespace SignalRTest.DataAccess
         {}
 
         public DbSet<UserDto> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserDto>()
+                .Property(b => b.Username)
+                .IsRequired();
+        }
     }
 }
