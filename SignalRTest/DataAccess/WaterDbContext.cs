@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SignalRTest.Domain.Dto;
 
 namespace SignalRTest.DataAccess
 {
@@ -8,6 +9,6 @@ namespace SignalRTest.DataAccess
             : base(options)
         {}
 
-
+        public DbSet<UserDto> Users { get; set; }
     }
 }
