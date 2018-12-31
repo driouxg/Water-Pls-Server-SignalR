@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
 namespace SignalRTest.Hubs
@@ -8,6 +9,11 @@ namespace SignalRTest.Hubs
         public async Task SendMessage(string user, string message)
         {
             await Clients.All.SendAsync("ReceiveMessage", user, message);
+        }
+
+        public void Hello()
+        {
+            Console.WriteLine("REACHED!");
         }
     }
 }
