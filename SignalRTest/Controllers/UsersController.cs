@@ -18,7 +18,7 @@ namespace SignalRTest.Controllers
         }
 
         [HttpPost]
-        public ActionResult<UserDto> CreateAsync(UserDto user)
+        public ActionResult<UserDto> CreateUserAsync(UserDto user)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
