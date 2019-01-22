@@ -6,6 +6,7 @@ using SignalRTest.Domain.Dto;
 
 namespace SignalRTest.Controllers
 {
+    // This changes to uri to localhost:5000/api/Users
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -31,9 +32,16 @@ namespace SignalRTest.Controllers
             return Created($"api/Users/{userCreatedInDb.Id}", userCreatedInDb);
         }
 
-        public string hi()
+        [HttpGet("hi1")]
+        public string Hello2()
         {
-            return "hello";
-        } 
+            return "hi";
+        }
+
+        [HttpGet("/hi2")]
+        public string Hello3()
+        {
+            return "hi 2";
+        }
     }
 }
