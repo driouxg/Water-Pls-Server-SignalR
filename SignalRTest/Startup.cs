@@ -41,8 +41,8 @@ namespace SignalRTest
                 builder
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .AllowAnyOrigin();
-                //.AllowCredentials();
+                    .WithOrigins("http://localhost:3000")
+                    .AllowCredentials();
             }));
 
             var connection = @"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0";
@@ -68,10 +68,7 @@ namespace SignalRTest
             //app.UseHttpsRedirection();
             //app.UseStaticFiles();
             app.UseCookiePolicy();
-            //app.UseCors("CorsPolicy");
-
             app.UseCors("CorsPolicy");
-
             app.UseSignalR(routes =>
             {
                 routes.MapHub<MessageHub>("/messageHub");

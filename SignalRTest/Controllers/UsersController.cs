@@ -33,9 +33,9 @@ namespace SignalRTest.Controllers
         }
 
         [HttpGet("hi1")]
-        public ActionResult<UserDto> GetUser(UserDto user)
+        public UserDto GetUser(UserDto user)
         {
-            return _dbContext.Users.Where(b => b.Username == user.Username).ToList();
+            return _dbContext.Users.Single(b => b.Username == user.Username);
         }
     }
 }

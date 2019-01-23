@@ -7,7 +7,7 @@ using SignalRTest.DataAccess;
 using SignalRTest.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Water_Pls_Server_SignalR_Tests
+namespace Water_Pls_Server_SignalR_Tests 
 {
     public class UsersControllerTest
     {
@@ -17,14 +17,15 @@ namespace Water_Pls_Server_SignalR_Tests
             // Arrange
             UserDto user = new UserDto(1, "sfds");
             var mockRepo = new Mock<WaterDbContext>();
-            mockRepo.Setup(repo => repo.Add<UserDto>).Returns(Task.FromResult(GetTestSessions()));
+            mockRepo.Setup(repo => repo.Add(user));
             var controller = new UsersController(mockRepo.Object);
 
             // Act
             var result = controller.CreateUserAsync(user);
 
             // Assert
-
+            Assert.Equal(user, result.Value);
+            Assert.Equal("api/Users/1", "api/Users/" + user.Id);
         }
     }
 }
