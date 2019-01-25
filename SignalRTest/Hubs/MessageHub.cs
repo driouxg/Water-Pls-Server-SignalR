@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SignalRTest.Hubs
 {
-    public class MessageHub : Hub
+    public class RequestWaterHub : Hub
     {
         private readonly ILogger _logger;
 
@@ -14,6 +14,18 @@ namespace SignalRTest.Hubs
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
-        public async Task 
+        public async Task RequestWater(string username)
+        {
+            // Convert to Value Object
+
+
+            var connectionId = Context.ConnectionId;
+            // Get 
+        }
+
+        private bool UserExists(s)
+        {
+
+        }
     }
 }
