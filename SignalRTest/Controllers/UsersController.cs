@@ -18,7 +18,7 @@ namespace SignalRTest.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost]
+        [HttpPost("CreateUserAsync")]
         public ActionResult<UserDto> CreateUserAsync(UserDto user)
         {
             if (!ModelState.IsValid)
