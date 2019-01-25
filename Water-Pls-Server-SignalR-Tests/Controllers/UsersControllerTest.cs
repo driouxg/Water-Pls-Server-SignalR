@@ -6,6 +6,7 @@ using Moq;
 using SignalRTest.DataAccess;
 using SignalRTest.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Water_Pls_Server_SignalR_Tests 
 {
@@ -16,7 +17,7 @@ namespace Water_Pls_Server_SignalR_Tests
         {
             // Arrange
             UserDto user = new UserDto(1, "sfds");
-            var mockRepo = new Mock<WaterDbContext>();
+            var mockRepo = new Mock<WaterDbContext>(new Mock<DbContextOptions<WaterDbContext>>());
             mockRepo.Setup(repo => repo.Add(user));
             var controller = new UsersController(mockRepo.Object);
 

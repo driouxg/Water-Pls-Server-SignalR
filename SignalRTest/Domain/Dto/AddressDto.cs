@@ -12,5 +12,6 @@ namespace SignalRTest.Domain.Dto
         public string route { get; set; }
         public string cityName { get; set; }
         public string stateName { get; set; }
+        public int zipcode { get; set; }
     }
 }
