@@ -10,6 +10,7 @@ namespace SignalRTest.DataAccess
         {}
 
         public DbSet<UserDto> Users { get; set; }
+        public DbSet<ClientConnectionDto> ClientConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
