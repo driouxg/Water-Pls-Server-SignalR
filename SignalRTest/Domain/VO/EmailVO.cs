@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.VO
 {
-    public class EmailVO : ValueObject
+    public class EmailVo : ValueObject
     {
         public string value { get; }
 
-        public EmailVO(string value)
+        public EmailVo(string value)
         {
             this.value = value;
             validateEmail();

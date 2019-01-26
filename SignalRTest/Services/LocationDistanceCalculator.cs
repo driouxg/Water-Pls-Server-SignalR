@@ -8,10 +8,10 @@ namespace SignalRTest.Services
     public class LocationDistanceCalculator
     {
         private ILogger _logger = new DebugLogger("root");
-        private readonly GeoCoordinatesVO location1;
-        private readonly GeoCoordinatesVO location2;
+        private readonly GeoCoordinatesVo location1;
+        private readonly GeoCoordinatesVo location2;
 
-        public LocationDistanceCalculator(GeoCoordinatesVO location1, GeoCoordinatesVO location2)
+        public LocationDistanceCalculator(GeoCoordinatesVo location1, GeoCoordinatesVo location2)
         {
             this.location1 = location1;
             this.location2 = location2;

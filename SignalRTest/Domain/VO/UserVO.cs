@@ -2,17 +2,17 @@
 
 namespace SignalRTest.Domain.VO
 {
-    public class UserVO : ValueObject
+    public class UserVo : ValueObject
     {
         public UsernameVO username { get; }
-        public NameVO firstName { get; }
-        public NameVO lastName { get; }
-        public EmailVO email { get; }
+        public NameVo firstName { get; }
+        public NameVo lastName { get; }
+        public EmailVo email { get; }
         public AddressDto addressDto { get; }
-        public GeoCoordinatesVO geoCoordinates { get; }
+        public GeoCoordinatesVo geoCoordinates { get; }
         public string clientConnection { get; }
 
-        public UserVO(UsernameVO username, NameVO firstName, NameVO lastName, EmailVO email, AddressDto addressDto, GeoCoordinatesVO geoCoordinates, string clientConnection)
+        public UserVo(UsernameVO username, NameVo firstName, NameVo lastName, EmailVo email, AddressDto addressDto, GeoCoordinatesVo geoCoordinates, string clientConnection)
         {
             this.username = username;
             this.firstName = firstName;

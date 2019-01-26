@@ -6,11 +6,11 @@ using SignalRTest.Domain.VO;
 
 namespace SignalRTest.Domain.Dto
 {
-    public class GeoCoordinateVO : ValueObject
+    public class GeoCoordinateVo : ValueObject
     {
         public double value { get; }
 
-        public GeoCoordinateVO(double value)
+        public GeoCoordinateVo(double value)
         {
             this.value = value;
             validateGeoCoordinate();

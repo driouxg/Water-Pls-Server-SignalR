@@ -6,12 +6,12 @@ using SignalRTest.Domain.Dto;
 
 namespace SignalRTest.Domain.VO
 {
-    public class GeoCoordinatesVO : ValueObject
+    public class GeoCoordinatesVo : ValueObject
     {
-        public GeoCoordinateVO latitude { get; }
-        public GeoCoordinateVO longitude { get; }
+        public GeoCoordinateVo latitude { get; }
+        public GeoCoordinateVo longitude { get; }
 
-        public GeoCoordinatesVO(GeoCoordinateVO latitude, GeoCoordinateVO longitude)
+        public GeoCoordinatesVo(GeoCoordinateVo latitude, GeoCoordinateVo longitude)
         {
             this.latitude = latitude;
             this.longitude = longitude;

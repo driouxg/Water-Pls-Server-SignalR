@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.VO
 {
-    public class NameVO : ValueObject
+    public class NameVo : ValueObject
     {
         public string value { get; }
 
-        public NameVO(string value)
+        public NameVo(string value)
         {
             this.value = value;
             isAlpha();
