@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.VO
 {
-    public class UsernameVO : ValueObject
+    public class UsernameVo : ValueObject
     {
         public string value { get; }
 
-        public UsernameVO(string value)
+        public UsernameVo(string value)
         {
             value = value;
             isAlphanumeric();
