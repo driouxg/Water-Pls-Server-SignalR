@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
-using SignalRTest.Domain.VO;
-using System.Collections.Generic;
 using SignalRTest.Domain;
+using SignalRTest.Domain.VO;
+using SignalRTest.Singleton;
 
 namespace SignalRTest.Hubs
 {
@@ -19,7 +19,7 @@ namespace SignalRTest.Hubs
         public RequestWaterHub(WaterDbContext dbContext)
         {
             _dbContext = dbContext;
-            requestorConnections = new ConnectionMap<UsernameVo>();
+            requestorConnections = RequestorConnectionSingleton.Instance;
         }
 
         public async Task SendMessage(string user, string message)
@@ -41,6 +41,7 @@ namespace SignalRTest.Hubs
                 var connectionId = Context.ConnectionId;
 
                 // Get the donator hub singleton
+
 
                 // Find the closest donator to the current requestor
 
