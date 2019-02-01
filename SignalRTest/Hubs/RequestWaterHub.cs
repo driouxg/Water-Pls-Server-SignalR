@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
 using SignalRTest.Domain.VO;
 using System.Collections.Generic;
+using SignalRTest.Domain;
 
 namespace SignalRTest.Hubs
 {
@@ -13,11 +14,12 @@ namespace SignalRTest.Hubs
     {
         private readonly ILogger _logger;
         private WaterDbContext _dbContext;
-        private Dictionary<string, UsernameVo> requestorMap = new Dictionary<string, UsernameVo>();
+        private ConnectionMap<UsernameVo> requestorConnections;
 
         public RequestWaterHub(WaterDbContext dbContext)
         {
             _dbContext = dbContext;
+            requestorConnections = new ConnectionMap<UsernameVo>();
         }
 
         public async Task SendMessage(string user, string message)
@@ -33,10 +35,12 @@ namespace SignalRTest.Hubs
             if (UserExists(usernameVo))
             {
                 // Add to requestor set
-                requestorMap.Add(Context.ConnectionId, usernameVo);
+                requestorConnections.Add(usernameVo, Context.ConnectionId);
 
                 // Get current client connection
                 var connectionId = Context.ConnectionId;
+
+                // Get the donator hub singleton
 
                 // Find the closest donator to the current requestor
 

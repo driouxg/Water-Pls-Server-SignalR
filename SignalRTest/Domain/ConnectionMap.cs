@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ namespace SignalRTest.Domain
 {
     public class ConnectionMap<T>
     {
+        private readonly ILogger _logger;
         private readonly Dictionary<T, HashSet<string>> _connections;
 
         public ConnectionMap()
@@ -22,6 +24,19 @@ namespace SignalRTest.Domain
         public void Add(T key, HashSet<string> value)
         {
             _connections.Add(key, value);
+        }
+
+        public void Add(T key, string value)
+        {
+            if (ContainsKey(key))
+            {
+                var set = new HashSet<string>();
+                set.Add(value);
+                _connections.Add(key, set);
+            } else
+            {
+                _logger.LogInformation($"Failed to add {key}:{value} to connectionMap.");
+            }
         }
 
         public void Remove(T key)
@@ -47,11 +62,6 @@ namespace SignalRTest.Domain
         public ICollection<T> Keys()
         {
             return _connections.Keys;
-        }
-
-        public ICollection<T, HashSet<string>> Pairs()
-        {
-            return _connections.
         }
     }
 }
