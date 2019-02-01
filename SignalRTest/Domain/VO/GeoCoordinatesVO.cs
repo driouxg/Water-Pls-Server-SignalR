@@ -17,6 +17,12 @@ namespace SignalRTest.Domain.VO
             this.longitude = longitude;
         }
 
+        public GeoCoordinatesVo(GeoCoordinatesDto geoCoordinatesDto)
+        {
+            latitude = new GeoCoordinateVo(geoCoordinatesDto.latitude);
+            longitude = new GeoCoordinateVo(geoCoordinatesDto.longitude);
+        }
+
         public double GetLatitude()
         {
             return latitude.value;

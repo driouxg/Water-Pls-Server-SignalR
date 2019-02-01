@@ -41,12 +41,16 @@ namespace SignalRTest.Hubs
                 var connectionId = Context.ConnectionId;
 
                 // Get the donator hub singleton
+                ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
 
+                // Get current user's coordinates
+                GetUserCoordinates(usernameVo);
 
                 // Find the closest donator to the current requestor
-
+                FindClosestDonator(usernameVo);
 
                 // Message the donator and requestor that their matches have been found
+
             }
             else
             {
@@ -54,10 +58,15 @@ namespace SignalRTest.Hubs
             }
         }
 
+        private GeoCoordinatesVo GetUserCoordinates(UsernameVo usernameVo)
+        {
+            var userDto = _dbContext.Users.Single(x => x.Username == usernameVo.value);
+            return new GeoCoordinatesVo(userDto.geoCoordinatesDto);
+        }
+
         private bool UserExists(UsernameVo username)
         {
-            var result = _dbContext.Users.Single(x => x.Username == username.value);
-            return result != null;
+            return _dbContext.Users.Single(x => x.Username == username.value) != null;
         }
     }
 }
