@@ -40,9 +40,6 @@ namespace SignalRTest.Hubs
                 // Get current client connection
                 var connectionId = Context.ConnectionId;
 
-                // Get the donator hub singleton
-                ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
-
                 // Get current user's coordinates
                 GetUserCoordinates(usernameVo);
 
@@ -56,6 +53,21 @@ namespace SignalRTest.Hubs
             {
                 _logger.LogInformation("Username: 'username' does not exist in database.");
             }
+        }
+
+        private UsernameVo FindClosestDonator(UsernameVo usernameVo)
+        {
+            // Get the donator hub singleton
+            ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
+
+            _logger.LogInformation($"Find closest donator to {usernameVo}. Searching through {donatorConnectionMap.Count()} active donators.");
+
+            foreach (var donatorUserName in donatorConnectionMap.Keys())
+            {
+                _dbContext
+            }
+
+            return;
         }
 
         private GeoCoordinatesVo GetUserCoordinates(UsernameVo usernameVo)
