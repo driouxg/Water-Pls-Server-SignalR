@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
 using SignalRTest.Domain;
+using SignalRTest.Domain.Dto;
 using SignalRTest.Domain.VO;
+using SignalRTest.Services;
 using SignalRTest.Singleton;
 
 namespace SignalRTest.Hubs
@@ -55,19 +58,50 @@ namespace SignalRTest.Hubs
             }
         }
 
-        private UsernameVo FindClosestDonator(UsernameVo usernameVo)
+        private ICollection<UserDto> FindClosestDonator(UsernameVo requesterName)
         {
             // Get the donator hub singleton
             ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
 
-            _logger.LogInformation($"Find closest donator to {usernameVo}. Searching through {donatorConnectionMap.Count()} active donators.");
+            _logger.LogInformation($"Find closest donator to {requesterName}. Searching through {donatorConnectionMap.Count()} active donators.");
 
-            foreach (var donatorUserName in donatorConnectionMap.Keys())
+            var vals = RetrieveConnectedDonators(donatorConnectionMap.Keys());
+
+            var result = QueryRequestorByName(requesterName);
+
+            return FindTheClosestDonator(result , vals);
+
+            return null;
+        }
+
+        private UserDto FindTheClosestDonator(UserDto requestor, ICollection<UserDto> donators)
+        {
+            UserDto closestDonator = null;
+            double shortestDistance = Single.NaN;
+            double distance = Single.NaN;
+            LocationDistanceCalculator calculator = null;
+
+            foreach (var donator in donators)
             {
-                _dbContext
+                calculator = new LocationDistanceCalculator(new GeoCoordinatesVo(requestor.geoCoordinatesDto), new GeoCoordinatesVo(donator.geoCoordinatesDto));
+
+                distance = calculator.CalculateDistanceInMiles();
+
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    closestDonator = donator;
+                }
             }
 
-            return;
+            return closestDonator;
+        }
+
+        private ICollection<UserDto> RetrieveConnectedDonators(ICollection<UsernameVo> donators)
+        {
+            return _dbContext.Users.Where(
+                i => donators.Contains(new UsernameVo(i.Username))
+            ).ToList();
         }
 
         private GeoCoordinatesVo GetUserCoordinates(UsernameVo usernameVo)
