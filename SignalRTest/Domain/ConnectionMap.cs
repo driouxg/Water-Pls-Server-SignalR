@@ -63,5 +63,10 @@ namespace SignalRTest.Domain
         {
             return _connections.Keys;
         }
+
+        public HashSet<string> GetValue(T key)
+        {
+            return _connections[key];
+        }
     }
 }

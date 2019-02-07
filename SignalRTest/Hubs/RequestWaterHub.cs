@@ -33,24 +33,30 @@ namespace SignalRTest.Hubs
         public async Task RequestWater(string username)
         {
             // Convert to Value Object
-            UsernameVo usernameVo = new UsernameVo(username);
+            UsernameVo requestorUsername = new UsernameVo(username);
 
-            if (UserExists(usernameVo))
+            if (UserExists(requestorUsername))
             {
                 // Add to requestor set
-                requestorConnections.Add(usernameVo, Context.ConnectionId);
+                requestorConnections.Add(requestorUsername, Context.ConnectionId);
 
                 // Get current client connection
                 var connectionId = Context.ConnectionId;
 
+                Context.User.
+
                 // Get current user's coordinates
-                GetUserCoordinates(usernameVo);
+                GetUserCoordinates(requestorUsername);
 
                 // Find the closest donator to the current requestor
-                FindClosestDonator(usernameVo);
+                var closestDonator = FindClosestDonator(requestorUsername);
 
                 // Message the donator and requestor that their matches have been found
-
+                HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValue(requestorUsername);
+                foreach (string donatorString in donatorConnectionStrings)
+                {
+                    Clients.User()
+                }
             }
             else
             {
@@ -58,20 +64,23 @@ namespace SignalRTest.Hubs
             }
         }
 
-        private ICollection<UserDto> FindClosestDonator(UsernameVo requesterName)
+        private UserDto FindClosestDonator(UsernameVo requestorName)
         {
             // Get the donator hub singleton
             ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
 
-            _logger.LogInformation($"Find closest donator to {requesterName}. Searching through {donatorConnectionMap.Count()} active donators.");
+            _logger.LogInformation($"Find closest donator to {requestorName}. Searching through {donatorConnectionMap.Count()} active donators.");
 
-            var vals = RetrieveConnectedDonators(donatorConnectionMap.Keys());
+            ICollection<UserDto> vals = RetrieveConnectedDonators(donatorConnectionMap.Keys());
 
-            var result = QueryRequestorByName(requesterName);
+            UserDto result = QueryRequestorByName(requestorName);
 
-            return FindTheClosestDonator(result , vals);
+            return FindTheClosestDonator(result, vals);
+        }
 
-            return null;
+        private UserDto QueryRequestorByName(UsernameVo usernameVo)
+        {
+            return _dbContext.Users.Single(i => i.Username == usernameVo.value);
         }
 
         private UserDto FindTheClosestDonator(UserDto requestor, ICollection<UserDto> donators)
