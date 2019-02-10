@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Identity;
 using Xunit;
 using SignalRTest;
 using SignalRTest.Domain.Dto;
@@ -7,6 +8,8 @@ using SignalRTest.DataAccess;
 using SignalRTest.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SignalRTest.Domain;
 
 namespace Water_Pls_Server_SignalR_Tests 
 {
@@ -18,7 +21,6 @@ namespace Water_Pls_Server_SignalR_Tests
             // Arrange
             UserDto user = new UserDto
             {
-                Id = 1,
                 email = "test@biscuit.com",
                 firstName = "Zelda",
                 lastName = "Peach",
@@ -39,8 +41,13 @@ namespace Water_Pls_Server_SignalR_Tests
                 },
             };
             var mockRepo = new Mock<WaterDbContext>(new Mock<DbContextOptions<WaterDbContext>>());
+            var mockLogger = new Mock<ILogger<UsersController>>();
+            var mockSignInManager = new Mock<SignInManager<ApplicationUser>>();
+            var mockUserManager = new Mock<UserManager<ApplicationUser>>();
+
+
             mockRepo.Setup(repo => repo.Add(user));
-            var controller = new UsersController(mockRepo.Object);
+            var controller = new UsersController(mockRepo.Object, mockSignInManager.Object, mockUserManager.Object, mockLogger.Object);
 
             // Act
             var result = controller.CreateUserAsync(user);

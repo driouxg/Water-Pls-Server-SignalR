@@ -1,8 +1,7 @@
 ﻿namespace SignalRTest.Domain.Dto
 {
-    public class UserDto
+    public class UserDto : Entity.Entity
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }

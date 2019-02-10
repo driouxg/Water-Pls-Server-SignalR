@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SignalRTest.DataAccess;
 using SignalRTest.Hubs;
 using System;
+using SignalRTest.Domain;
 
 namespace SignalRTest
 {
@@ -44,6 +45,8 @@ namespace SignalRTest
             }));
 
             var connection = @"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0";
+            var identityManagementConnection = @"Server=(localdb)\mssqllocaldb;Database=IdentityManagementDb;Trusted_Connection=True;ConnectRetryCount=0";
+
             services.AddDbContext<WaterDbContext>
                 (options => options.UseSqlServer(connection));
 
@@ -55,12 +58,15 @@ namespace SignalRTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseSqlServer(
+            //        Configuration.GetConnectionString(@"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0")));
+            //services.AddDbContext<ApplicationDbContext>
+            //    (options => options.UseSqlServer(identityManagementConnection));
+
+            services.AddDefaultIdentity<ApplicationUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<WaterDbContext>();
 
             services.Configure<IdentityOptions>(options =>
             {

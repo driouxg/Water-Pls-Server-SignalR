@@ -43,7 +43,7 @@ namespace SignalRTest.Hubs
                 // Get current client connection
                 var connectionId = Context.ConnectionId;
 
-                Context.User.
+                //Context.User.
 
                 // Get current user's coordinates
                 GetUserCoordinates(requestorUsername);
@@ -53,10 +53,10 @@ namespace SignalRTest.Hubs
 
                 // Message the donator and requestor that their matches have been found
                 HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValue(requestorUsername);
-                foreach (string donatorString in donatorConnectionStrings)
-                {
-                    Clients.User()
-                }
+                //foreach (string donatorString in donatorConnectionStrings)
+                //{
+                //    Clients.User()
+                //}
             }
             else
             {

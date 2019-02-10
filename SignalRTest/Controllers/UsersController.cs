@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -52,8 +53,8 @@ namespace SignalRTest.Controllers
             return _dbContext.Users.Single(b => b.Username == user.Username);
         }
 
-        [HttpPost("register")]
-        public async ActionResult<UserDto> Login(UserLoginDto userLoginDto)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginDto userLoginDto)
         {
             if (!ModelState.IsValid)
             {
@@ -70,7 +71,7 @@ namespace SignalRTest.Controllers
                 _logger.LogWarning($"User {userLoginDto.username} has been locked out");
             }
 
-            return SignIn();
+            return Ok();
         } 
     }
 }

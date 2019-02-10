@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SignalRTest.Domain.Dto
+﻿namespace SignalRTest.Domain.Dto
 {
-    public class AddressDto
+    public class AddressDto : Entity.Entity
     {
         public int streetNumber { get; set; }
         public string streetName { get; set; }
