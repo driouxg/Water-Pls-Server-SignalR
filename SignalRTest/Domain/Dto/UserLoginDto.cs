@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.Dto
 {
-    public class UserLoginDto
+    public class UserLoginDto : Entity.Entity
     {
         [Required]
         public string username { get; set; }
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string email { get; set; }
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]

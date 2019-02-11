@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Xunit;
 using SignalRTest;
 using SignalRTest.Domain.Dto;
@@ -44,10 +45,11 @@ namespace Water_Pls_Server_SignalR_Tests
             var mockLogger = new Mock<ILogger<UsersController>>();
             var mockSignInManager = new Mock<SignInManager<ApplicationUser>>();
             var mockUserManager = new Mock<UserManager<ApplicationUser>>();
+            var mockEmailSender = new Mock<IEmailSender>();
 
 
             mockRepo.Setup(repo => repo.Add(user));
-            var controller = new UsersController(mockRepo.Object, mockSignInManager.Object, mockUserManager.Object, mockLogger.Object);
+            var controller = new UsersController(mockRepo.Object, mockSignInManager.Object, mockUserManager.Object, mockEmailSender.Object, mockLogger.Object);
 
             // Act
             var result = controller.CreateUserAsync(user);
