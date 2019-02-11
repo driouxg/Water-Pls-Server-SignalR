@@ -1,8 +1,12 @@
 # Tasks
 
-- [] Setup Identity Management in Program.cs using JWT
-- [] Re-test that front end component can connect to API.
-- [] Add register, login, ban, and delete operations to users controller.
+Done? | Task
+:---:| ---
+⬜️| Setup Identity Management in Program.cs using JWT
+⬜️| Re-test that front end component can connect to API.
+⬜️ | Add register, login, ban, and delete operations to users controller.
+✅ | <Insert Additional Task Name Here>
+
 
 # How To:
 
