@@ -11,7 +11,7 @@ namespace SignalRTest.Domain.VO
 
         public UsernameVo(string value)
         {
-            value = value;
+            this.value = value;
             isAlphanumeric();
         }
 

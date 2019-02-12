@@ -11,6 +11,13 @@ using SignalRTest.DataAccess;
 using SignalRTest.Hubs;
 using System;
 using SignalRTest.Domain;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.SignalR;
+using SignalRTest.Authentication;
 
 namespace SignalRTest
 {
@@ -44,12 +51,62 @@ namespace SignalRTest
                     .AllowCredentials();
             }));
 
+            // SQLServer Express Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;
             var connection = @"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0";
-            var identityManagementConnection = @"Server=(localdb)\mssqllocaldb;Database=IdentityManagementDb;Trusted_Connection=True;ConnectRetryCount=0";
 
             services.AddDbContext<WaterDbContext>
                 (options => options.UseSqlServer(connection));
 
+            // Creating signing certificate for JWT
+            //X509Certificate2 cert = new X509Certificate2("powershellcert.pfx", "password1234");
+            X509Certificate2 cert = new X509Certificate2("powershellcert.pfx", "password1234");
+
+            services.AddAuthentication(options =>
+            {
+                // Identity made Cookie authentication the default.
+                // However, we want JWT Bearer Auth to be the default.
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                // Configure JWT Bearer Auth to expect our security key
+                options.TokenValidationParameters =
+                    new TokenValidationParameters
+                    {
+                        LifetimeValidator = (before, expires, token, param) =>
+                        {
+                            return expires > DateTime.UtcNow;
+                        },
+                        ValidateAudience = false,
+                        ValidateIssuer = false,
+                        ValidateActor = false,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = new X509SecurityKey(cert)
+            };
+
+                // We have to hook the OnMessageReceived event in order to
+                // allow the JWT authentication handler to read the access
+                // token from the query string when a WebSocket or 
+                // Server-Sent Events request comes in.
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // If the request is for our hub...
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/hubs/chat")))
+                        {
+                            // Read the token out of the query string
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
             // ASP.NET Core 2.2 Authorization and Identity
             services.Configure<CookiePolicyOptions>(options =>
@@ -68,8 +125,20 @@ namespace SignalRTest
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<WaterDbContext>();
 
+            // Change to use Name as the user identifier for SignalR
+            // WARNING: This requires that the source of your JWT token 
+            // ensures that the Name claim is unique!
+            // If the Name claim isn't unique, users could receive messages 
+            // intended for a different user!
+            services.AddSingleton<IUserIdProvider, ApplicationUserIdProvider>();    // <----- This originally was services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+
             services.Configure<IdentityOptions>(options =>
             {
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
+
                 // Password settings.
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
@@ -82,11 +151,6 @@ namespace SignalRTest
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
-
-                // User settings.
-                options.User.AllowedUserNameCharacters =
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = false;
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -94,6 +158,7 @@ namespace SignalRTest
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.Cookie.Name = "MySuperDuperCookie";
 
                 options.LoginPath = "/Identity/Account/Login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";

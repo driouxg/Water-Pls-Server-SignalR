@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
@@ -13,6 +14,7 @@ using SignalRTest.Singleton;
 
 namespace SignalRTest.Hubs
 {
+    [Authorize]
     public class RequestWaterHub : Hub
     {
         private readonly ILogger _logger;

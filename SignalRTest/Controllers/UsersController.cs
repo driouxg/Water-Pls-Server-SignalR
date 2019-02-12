@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using SignalRTest.Domain;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace SignalRTest.Controllers
 {
@@ -34,6 +35,7 @@ namespace SignalRTest.Controllers
             _dbContext = dbContext;
             _signInManager = signInManager;
             _userManager = userManager;
+            _emailSender = emailSender;
             _logger = logger;
         }
 
@@ -51,12 +53,6 @@ namespace SignalRTest.Controllers
             return Created($"api/Users/{userCreatedInDb.Id}", userCreatedInDb);
         }
 
-        [HttpGet("hi1")]
-        public UserDto GetUser(UserDto user)
-        {
-            return _dbContext.Users.Single(b => b.Username == user.Username);
-        }
-
         [HttpPost("logout")]
         public async Task<IActionResult> Logout(UserLoginDto userLoginDto)
         {
@@ -70,9 +66,16 @@ namespace SignalRTest.Controllers
             return Ok();
         }
 
+        [HttpPost("logoutHttpContext")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Ok();
+        }
+
         [HttpPost("register")]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(UserLoginDto userLoginDto, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -126,5 +129,24 @@ namespace SignalRTest.Controllers
 
             return Ok();
         } 
+
+        [HttpPost("loginCookie")]
+        public async Task<IActionResult> LoginCookie(UserLoginDto userLoginDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim("user", userLoginDto.username),
+                new Claim("role", "Member")
+            };
+
+            await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
+
+            return Ok();
+        }
     }
 }
