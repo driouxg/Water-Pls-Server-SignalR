@@ -9,7 +9,8 @@ Done? | Task
 
 
 # Dependencies
-- 
+- SendGrid
+    * We use SendGrid to handle all of the dirty work involving making sure automatic emails being sent out are safe and secure. Therefore, we must set a secret key that is used to send emails through SendGrid using our organization account. Follow [this guide](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-2.2&tabs=netcore-cli) to get things setup.
 
 # How To:
 

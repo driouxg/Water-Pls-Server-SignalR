@@ -82,7 +82,7 @@ namespace SignalRTest.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            
             var user = new ApplicationUser {UserName = userLoginDto.username, Email = userLoginDto.email};
             var result = await _userManager.CreateAsync(user, userLoginDto.password);
 
@@ -91,14 +91,19 @@ namespace SignalRTest.Controllers
                 _logger.LogInformation($"Created new account for user '{userLoginDto.username}'");
 
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = Url.Page("/Account/ConfirmEmail",
-                    pageHandler: null,
-                    values: new {userId = user.Id, code = code},
-                    protocol: Request.Scheme);
-                await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                return LocalRedirect(returnUrl);
+                //var callbackUrl = Url.Page("/Account/ConfirmEmail",
+                //    pageHandler: null,
+                //    values: new {userId = user.Id, code = code},
+                //    protocol: Request.Scheme);
+
+                //await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                await _emailSender.SendEmailAsync(user.Email, "Confirm Your Email", "Hello");
+
+                //return LocalRedirect(returnUrl);
+                return Ok();
             }
             else
             {

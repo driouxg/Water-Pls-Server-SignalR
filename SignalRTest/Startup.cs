@@ -16,8 +16,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
 using SignalRTest.Authentication;
+using SignalRTest.Services;
 
 namespace SignalRTest
 {
@@ -57,9 +59,15 @@ namespace SignalRTest
             services.AddDbContext<WaterDbContext>
                 (options => options.UseSqlServer(connection));
 
+            // requires
+            // using Microsoft.AspNetCore.Identity.UI.Services;
+            // using WebPWrecover.Services;
+            services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
+
             // Creating signing certificate for JWT
-            //X509Certificate2 cert = new X509Certificate2("powershellcert.pfx", "password1234");
-            X509Certificate2 cert = new X509Certificate2("powershellcert.pfx", "password1234");
+            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+                                                                                               X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
             {
