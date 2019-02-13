@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using SignalRTest.Domain;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
 
 namespace SignalRTest.Controllers
 {
@@ -74,9 +75,10 @@ namespace SignalRTest.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(UserLoginDto userLoginDto, string returnUrl = null)
         {
+            returnUrl = returnUrl ?? Url.Content("~/");
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -96,10 +98,19 @@ namespace SignalRTest.Controllers
                 //    values: new {userId = user.Id, code = code},
                 //    protocol: Request.Scheme);
 
-                //await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                _logger.LogInformation($"USERID: {user.Id}    and CODE: {code}");
 
-                await _emailSender.SendEmailAsync(user.Email, "Confirm Your Email", "Hello");
+                var callbackUrl = Url.Link(
+                    routeName: "yoyo",
+                    values: new {usersId = user.Id, code = code}
+                );
+
+                _logger.LogInformation("MY CALLBACK URL: " + callbackUrl);
+
+                await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                //await _emailSender.SendEmailAsync(user.Email, "Confirm Your Email", "Hello");
 
                 //return LocalRedirect(returnUrl);
                 return Ok();
@@ -108,6 +119,34 @@ namespace SignalRTest.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpPost("authenticate")]
+        [Route("authenticate/{usersId}/{code}", Name = "yoyo")]
+        public async Task<IActionResult> Authenticate(string usersId, string code)
+        {
+            _logger.LogInformation($"REACHED!!!!    with {usersId}");
+
+            var user = await _userManager.FindByIdAsync(usersId);
+            code = code.Replace("%2f", "/").Replace("%2F", "/");
+
+            if (user == null)
+            {
+                _logger.LogWarning($"Could not find user by id {usersId}");
+                return BadRequest($"Could not find user by id {usersId}");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning($"Invalid Email verification token for user {usersId}");
+                return BadRequest($"Invalid Email verification token for user {usersId}");
+            }
+
+            _logger.LogInformation($"Successfully verified email verification token for {usersId}");
+
+            return Ok();
         }
 
         [HttpPost("login")]

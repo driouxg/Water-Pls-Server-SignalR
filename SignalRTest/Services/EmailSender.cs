@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Configuration;
-using System;
+using System.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -13,6 +14,8 @@ namespace SignalRTest.Services
 {
     public class EmailSender : IEmailSender
     {
+        //private readonly ILogger _logger;
+
         public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
         {
             Options = optionsAccessor.Value;
@@ -41,7 +44,19 @@ namespace SignalRTest.Services
             // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.SetClickTracking(false, false);
 
+            //var response = await client.SendEmailAsync(msg);
+
             return client.SendEmailAsync(msg);
+
+            //if (response.StatusCode == HttpStatusCode.Accepted)
+            //    _logger.LogInformation($"Successfully sent email to {email}");
+            //else
+            //{
+            //    var bodyResult = await response.Body.ReadAsStringAsync();
+            //
+            //    // Deserialize the reponse
+            //    //var sendGridResponse = JsonConvert.DeserializeObject<SendGridResponse>(bodyResult);
+            //}
         }
     }
 }

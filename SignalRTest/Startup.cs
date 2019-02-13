@@ -63,7 +63,7 @@ namespace SignalRTest
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
