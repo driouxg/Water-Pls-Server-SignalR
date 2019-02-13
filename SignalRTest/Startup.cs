@@ -11,14 +11,12 @@ using SignalRTest.DataAccess;
 using SignalRTest.Hubs;
 using System;
 using SignalRTest.Domain;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
-using SignalRTest.Authentication;
 using SignalRTest.Services;
 
 namespace SignalRTest
@@ -53,7 +51,6 @@ namespace SignalRTest
                     .AllowCredentials();
             }));
 
-            // SQLServer Express Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;
             var connection = @"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0";
 
             services.AddDbContext<WaterDbContext>
@@ -66,7 +63,7 @@ namespace SignalRTest
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
@@ -129,9 +126,12 @@ namespace SignalRTest
             //services.AddDbContext<ApplicationDbContext>
             //    (options => options.UseSqlServer(identityManagementConnection));
 
-            services.AddDefaultIdentity<ApplicationUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<WaterDbContext>();
+            services.AddDefaultIdentity<ApplicationUser>(config =>
+            {
+                config.SignIn.RequireConfirmedEmail = true;
+            })
+            .AddDefaultUI(UIFramework.Bootstrap4)
+            .AddEntityFrameworkStores<WaterDbContext>();
 
             // Change to use Name as the user identifier for SignalR
             // WARNING: This requires that the source of your JWT token 
