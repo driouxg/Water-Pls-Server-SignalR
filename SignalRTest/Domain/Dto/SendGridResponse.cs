@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.Dto
 {
-    public class MyTokenResponse
+    public class SendGridResponse
     {
+        public List<SendGridResponseError> Errors { get; set; }
     }
 }

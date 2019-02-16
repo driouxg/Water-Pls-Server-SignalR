@@ -42,6 +42,8 @@ namespace SignalRTest
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSignalR();
+
+            // CORS
             services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
             {
                 builder
@@ -63,7 +65,7 @@ namespace SignalRTest
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
@@ -120,17 +122,13 @@ namespace SignalRTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(
-            //        Configuration.GetConnectionString(@"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0")));
-            //services.AddDbContext<ApplicationDbContext>
-            //    (options => options.UseSqlServer(identityManagementConnection));
-
             services.AddDefaultIdentity<ApplicationUser>(config =>
             {
                 config.SignIn.RequireConfirmedEmail = true;
+                config.SignIn.RequireConfirmedPhoneNumber = false;
             })
             .AddDefaultUI(UIFramework.Bootstrap4)
+            .AddRoles<IdentityRole>()                       // I believe this may add the RoleManager class
             .AddEntityFrameworkStores<WaterDbContext>();
 
             // Change to use Name as the user identifier for SignalR

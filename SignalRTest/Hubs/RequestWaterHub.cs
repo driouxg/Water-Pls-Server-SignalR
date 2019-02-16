@@ -21,9 +21,10 @@ namespace SignalRTest.Hubs
         private WaterDbContext _dbContext;
         private ConnectionMap<UsernameVo> requestorConnections;
 
-        public RequestWaterHub(WaterDbContext dbContext)
+        public RequestWaterHub(WaterDbContext dbContext, ILogger<RequestWaterHub> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
             requestorConnections = RequestorConnectionSingleton.Instance;
         }
 

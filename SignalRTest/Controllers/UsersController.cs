@@ -39,46 +39,18 @@ namespace SignalRTest.Controllers
             _logger = logger;
         }
 
-        [HttpPost("CreateUserAsync")]
-        public ActionResult<UserDto> CreateUserAsync(UserDto user)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            _dbContext.Users.Add(user);
-            _dbContext.SaveChanges();
-
-            var userCreatedInDb = _dbContext.Users.Single(u => u.Username == user.Username);
-
-            return Created($"api/Users/{userCreatedInDb.Id}", userCreatedInDb);
-        }
-
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout(UserLoginDto userLoginDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation($"User {userLoginDto.username} has logged out.");
-            return Ok();
-        }
-
-        [HttpPost("logoutHttpContext")]
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
-            return Ok();
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation($"User {User.Identity.Name} has logged out.");
+            return Ok($"User {User.Identity.Name} has logged out.");
         }
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(UserLoginDto userLoginDto, string returnUrl = null)
+        public async Task<IActionResult> Register(UserLoginDto userLoginDto)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -87,46 +59,36 @@ namespace SignalRTest.Controllers
             var user = new ApplicationUser {UserName = userLoginDto.username, Email = userLoginDto.email};
             var result = await _userManager.CreateAsync(user, userLoginDto.password);
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                _logger.LogInformation($"Created new account for user '{userLoginDto.username}'");
-
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-                //var callbackUrl = Url.Page("/Account/ConfirmEmail",
-                //    pageHandler: null,
-                //    values: new {userId = user.Id, code = code},
-                //    protocol: Request.Scheme);
-
-                _logger.LogInformation($"USERID: {user.Id}    and CODE: {code}");
-
-                var callbackUrl = Url.Link(
-                    routeName: "yoyo",
-                    values: new {usersId = user.Id, code = code}
-                );
-
-                _logger.LogInformation("MY CALLBACK URL: " + callbackUrl);
-
-                await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                //await _emailSender.SendEmailAsync(user.Email, "Confirm Your Email", "Hello");
-
-                //return LocalRedirect(returnUrl);
-                return Ok();
+                return NotFound($"Error Creatting user {userLoginDto.username}");
             }
-            else
-            {
-                return NotFound();
-            }
+
+            _logger.LogInformation($"Created new account for user '{userLoginDto.username}'");
+
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            _logger.LogInformation($"USERID: {user.Id}    and CODE: {code}");
+
+            var callbackUrl = Url.Link(
+                routeName: "verify.email",
+                values: new {usersId = user.Id, code = code}
+            );
+
+            _logger.LogInformation("MY CALLBACK URL: " + callbackUrl);
+
+            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+            var userCreatedInDb = _dbContext.IdManagementUsers.Single(x => x.UserName == userLoginDto.username);
+
+            return Created($"api/Users/{userCreatedInDb.Id}", $"Created user {userCreatedInDb.Id}");
         }
 
-        [HttpPost("authenticate")]
-        [Route("authenticate/{usersId}/{code}", Name = "yoyo")]
-        public async Task<IActionResult> Authenticate(string usersId, string code)
+        [HttpGet("verifyemail")]
+        [Route("verifyemail/{usersId}/{code}", Name = "verify.email")]
+        public async Task<IActionResult> VerifyEmail(string usersId, string code)
         {
-            _logger.LogInformation($"REACHED!!!!    with {usersId}");
-
             var user = await _userManager.FindByIdAsync(usersId);
             code = code.Replace("%2f", "/").Replace("%2F", "/");
 
@@ -146,7 +108,7 @@ namespace SignalRTest.Controllers
 
             _logger.LogInformation($"Successfully verified email verification token for {usersId}");
 
-            return Ok();
+            return Ok($"Successfully verified email verification token for {usersId}");
         }
 
         [HttpPost("login")]
@@ -158,38 +120,34 @@ namespace SignalRTest.Controllers
             }
 
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            //await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var result = await _signInManager.PasswordSignInAsync(userLoginDto.username, userLoginDto.password, userLoginDto.rememberMe, lockoutOnFailure: true);
 
             if (result.Succeeded)
             {
                 _logger.LogInformation($"User {userLoginDto.username} logged in.");
+                return Ok($"User {userLoginDto.username} logged in.");
             } else if (result.IsLockedOut)
             {
                 _logger.LogWarning($"User {userLoginDto.username} has been locked out");
+                return Unauthorized($"User {userLoginDto.username} has been locked out");
             }
-
-            return Ok();
+            else if (result.RequiresTwoFactor)
+            {
+                _logger.LogWarning($"User {userLoginDto.username} has not set up TwoFactorAuthentication");
+                return Unauthorized($"User {userLoginDto.username} has not set up TwoFactorAuthentication");
+            }
+            else if (result.IsNotAllowed)
+            {
+                _logger.LogWarning($"User {userLoginDto.username} is not allowed login. Possible issues: Missing email verification.");
+                return Unauthorized($"User {userLoginDto.username} is not allowed to login. Possible issues: Missing email verification.");
+            }
+            else
+            {
+                _logger.LogWarning($"Incorrect password User {userLoginDto.username}");
+                return NotFound($"Incorrect password User {userLoginDto.username}");
+            }
         } 
-
-        [HttpPost("loginCookie")]
-        public async Task<IActionResult> LoginCookie(UserLoginDto userLoginDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var claims = new List<Claim>
-            {
-                new Claim("user", userLoginDto.username),
-                new Claim("role", "Member")
-            };
-
-            await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
-
-            return Ok();
-        }
     }
 }
