@@ -18,7 +18,7 @@ namespace Water_Pls_Server_SignalR_Tests
 {
     public class UsersControllerTest
     {
-        Mock<WaterDbContext> mockRepo = new Mock<WaterDbContext>(new Mock<DbContextOptions<WaterDbContext>>());
+        //Mock<WaterDbContext> mockRepo = new Mock<WaterDbContext>(new Mock<DbContextOptions<WaterDbContext>>());
         Mock<ILogger<UsersController>> mockLogger = new Mock<ILogger<UsersController>>();
         Mock<SignInManager<ApplicationUser>> mockSignInManager = new Mock<SignInManager<ApplicationUser>>();
         //Mock<UserManager<ApplicationUser>> mockUserManager = MockUserManager<UserLoginDto>(new List<UserLoginDto>()

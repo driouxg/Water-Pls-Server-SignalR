@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SignalRTest.Domain.Entity
 {
-    public class IEntity
+    public interface IEntity
     {
         int Id { get; }
     }

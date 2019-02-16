@@ -83,7 +83,7 @@ namespace SignalRTest.Hubs
 
         private UserDto QueryRequestorByName(UsernameVo usernameVo)
         {
-            return _dbContext.Users.Single(i => i.Username == usernameVo.value);
+            return null;//_dbContext.Users.Single(i => i.Username == usernameVo.value);
         }
 
         private UserDto FindTheClosestDonator(UserDto requestor, ICollection<UserDto> donators)
@@ -111,20 +111,21 @@ namespace SignalRTest.Hubs
 
         private ICollection<UserDto> RetrieveConnectedDonators(ICollection<UsernameVo> donators)
         {
-            return _dbContext.Users.Where(
-                i => donators.Contains(new UsernameVo(i.Username))
-            ).ToList();
+            return null;
+            //return _dbContext.Users.Where(
+            //    i => donators.Contains(new UsernameVo(i.Username))
+            //).ToList();
         }
 
         private GeoCoordinatesVo GetUserCoordinates(UsernameVo usernameVo)
         {
-            var userDto = _dbContext.Users.Single(x => x.Username == usernameVo.value);
-            return new GeoCoordinatesVo(userDto.geoCoordinatesDto);
+            //var userDto = _dbContext.Users.Single(x => x.Username == usernameVo.value);
+            return null; //new GeoCoordinatesVo(userDto.geoCoordinatesDto);
         }
 
         private bool UserExists(UsernameVo username)
         {
-            return _dbContext.Users.Single(x => x.Username == username.value) != null;
+            return false; //_dbContext.Users.Single(x => x.Username == username.value) != null;
         }
     }
 }
