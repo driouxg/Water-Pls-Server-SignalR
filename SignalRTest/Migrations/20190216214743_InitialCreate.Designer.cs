@@ -10,8 +10,8 @@ using SignalRTest.DataAccess;
 namespace SignalRTest.Migrations
 {
     [DbContext(typeof(WaterDbContext))]
-    [Migration("20190216184704_RemovedUsersDB")]
-    partial class RemovedUsersDB
+    [Migration("20190216214743_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -166,75 +166,6 @@ namespace SignalRTest.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SignalRTest.Domain.Dto.AddressDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("cityName");
-
-                    b.Property<string>("route");
-
-                    b.Property<string>("stateName");
-
-                    b.Property<string>("streetName");
-
-                    b.Property<int>("streetNumber");
-
-                    b.Property<int>("zipcode");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AddressDto");
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.Dto.GeoCoordinatesDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<double>("latitude");
-
-                    b.Property<double>("longitude");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GeoCoordinatesDto");
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.Dto.UserDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Username");
-
-                    b.Property<int?>("addressDtoId");
-
-                    b.Property<string>("clientConnection");
-
-                    b.Property<string>("connectionStatus");
-
-                    b.Property<string>("email");
-
-                    b.Property<string>("firstName");
-
-                    b.Property<int?>("geoCoordinatesDtoId");
-
-                    b.Property<string>("lastName");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("addressDtoId");
-
-                    b.HasIndex("geoCoordinatesDtoId");
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("SignalRTest.Domain.Dto.UserLoginDto", b =>
                 {
                     b.Property<int>("Id")
@@ -336,17 +267,6 @@ namespace SignalRTest.Migrations
                     b.HasOne("SignalRTest.Domain.Dto.UserLoginDto", "userLogin")
                         .WithMany()
                         .HasForeignKey("userLoginId");
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.Dto.UserDto", b =>
-                {
-                    b.HasOne("SignalRTest.Domain.Dto.AddressDto", "addressDto")
-                        .WithMany()
-                        .HasForeignKey("addressDtoId");
-
-                    b.HasOne("SignalRTest.Domain.Dto.GeoCoordinatesDto", "geoCoordinatesDto")
-                        .WithMany()
-                        .HasForeignKey("geoCoordinatesDtoId");
                 });
 #pragma warning restore 612, 618
         }

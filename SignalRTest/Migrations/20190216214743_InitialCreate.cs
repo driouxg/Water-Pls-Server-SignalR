@@ -2,7 +2,7 @@
 
 namespace SignalRTest.Migrations
 {
-    public partial class RemovedIdentityClaims : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
