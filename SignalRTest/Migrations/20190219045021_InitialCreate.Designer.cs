@@ -10,7 +10,7 @@ using SignalRTest.DataAccess;
 namespace SignalRTest.Migrations
 {
     [DbContext(typeof(WaterDbContext))]
-    [Migration("20190218005754_InitialCreate")]
+    [Migration("20190219045021_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,7 +149,7 @@ namespace SignalRTest.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<int?>("userLoginId");
+                    b.Property<int?>("UserRegistrationId");
 
                     b.HasKey("Id");
 
@@ -161,12 +161,12 @@ namespace SignalRTest.Migrations
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("userLoginId");
+                    b.HasIndex("UserRegistrationId");
 
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SignalRTest.Domain.Dto.UserLoginDto", b =>
+            modelBuilder.Entity("SignalRTest.Domain.Dto.UserRegistrationDto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -179,14 +179,12 @@ namespace SignalRTest.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
-                    b.Property<bool>("rememberMe");
-
                     b.Property<string>("username")
                         .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserLoginDto");
+                    b.ToTable("UserRegistrationDto");
                 });
 
             modelBuilder.Entity("SignalRTest.Domain.Entity.ApplicationRole", b =>
@@ -264,9 +262,9 @@ namespace SignalRTest.Migrations
 
             modelBuilder.Entity("SignalRTest.Domain.ApplicationUser", b =>
                 {
-                    b.HasOne("SignalRTest.Domain.Dto.UserLoginDto", "userLogin")
+                    b.HasOne("SignalRTest.Domain.Dto.UserRegistrationDto", "UserRegistration")
                         .WithMany()
-                        .HasForeignKey("userLoginId");
+                        .HasForeignKey("UserRegistrationId");
                 });
 #pragma warning restore 612, 618
         }

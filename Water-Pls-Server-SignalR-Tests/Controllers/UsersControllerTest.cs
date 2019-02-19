@@ -21,7 +21,7 @@ namespace Water_Pls_Server_SignalR_Tests
         //Mock<WaterDbContext> mockRepo = new Mock<WaterDbContext>(new Mock<DbContextOptions<WaterDbContext>>());
         Mock<ILogger<UsersController>> mockLogger = new Mock<ILogger<UsersController>>();
         Mock<SignInManager<ApplicationUser>> mockSignInManager = new Mock<SignInManager<ApplicationUser>>();
-        //Mock<UserManager<ApplicationUser>> mockUserManager = MockUserManager<UserLoginDto>(new List<UserLoginDto>()
+        //Mock<UserManager<ApplicationUser>> mockUserManager = MockUserManager<UserRegistrationDto>(new List<UserRegistrationDto>()
         //{
         //    CreateValidUserLoginDto()
         //}
@@ -32,7 +32,7 @@ namespace Water_Pls_Server_SignalR_Tests
         public void UsersController_Register_SuccessfullyRegistersUser()
         {
             // Arrange
-            UserLoginDto userLoginDto = CreateValidUserLoginDto();
+            UserRegistrationDto userRegistrationDto = CreateValidUserLoginDto();
             //var controller = new UsersController(mockRepo.Object, mockSignInManager.Object, mockUserManager.Object, mockEmailSender.Object, mockLogger.Object);
             //mockUserManager = new Mock<UserManager<ApplicationUser>>(new Mock<IUserStore<ApplicationUser>>());
             //mockUserManager.Object.UserValidators.Add(new UserValidator<ApplicationUser>());
@@ -41,7 +41,7 @@ namespace Water_Pls_Server_SignalR_Tests
             //mockUserManager = MockUserManager(ApplicationUser);
 
             // Act
-            //var result = controller.Register(userLoginDto);
+            //var result = controller.Register(userRegistrationDto);
 
             // Assert
             //Assert.IsType<OkObjectResult>(result);
@@ -88,14 +88,13 @@ namespace Water_Pls_Server_SignalR_Tests
             };
         }
 
-        public static UserLoginDto CreateValidUserLoginDto()
+        public static UserRegistrationDto CreateValidUserLoginDto()
         {
-            return new UserLoginDto
+            return new UserRegistrationDto
             {
                 username = "biscuit",
                 email = "hellothere@tasty.com",
                 password = "mySuperSecretPassword!3",
-                rememberMe = true
             };
         }
     }

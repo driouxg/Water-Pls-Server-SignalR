@@ -3,36 +3,72 @@ using SignalRTest.DataAccess;
 using SignalRTest.Domain;
 using SignalRTest.Domain.Entity;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SignalRTest.Services
 {
     public class RoleCreator
     {
-        public static async Task Initialize(WaterDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationUser> roleManager)
+        private readonly WaterDbContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        string password = "P@$$w0rd";
+
+        public RoleCreator(WaterDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
-            dbContext.Database.EnsureCreated();
+            _dbContext = dbContext;
+            _userManager = userManager;
+            _roleManager = roleManager;
+        }
 
-            String adminId1 = "";
-            String adminId2 = "";
+        public async Task Initialize()
+        {
+            _dbContext.Database.EnsureCreated();
 
-            string role1 = "Admin";
+            string name1 = "aa@aa.aa";
+            string role1 = "Administrator";
             string desc1 = "This is the description for the admin";
 
+            string name2 = "bb@bb.bb";
             string role2 = "Member";
             string desc2 = "This is the description for the member";
 
-            string password = "P@$$w0rd";
+            string name3 = "cc@cc.cc";
+            string role3 = "Manager";
+            string desc3 = "This is the description for the manager";
 
-            if (await roleManager.FindByNameAsync(role1) == null)
+            await CreateRoleIfNonExistent(role1, desc1);
+            await CreateRoleIfNonExistent(role2, desc2);
+            await CreateRoleIfNonExistent(role3, desc3);
+
+            await CreateItems(name1, role1, name1);
+            await CreateItems(name2, role2, name2);
+            await CreateItems(name3, role3, name3);
+        }
+
+        public async Task CreateRoleIfNonExistent(string role, string description)
+        {
+            if (await _roleManager.FindByNameAsync(role) == null)
             {
-                await roleManager.CreateAsync(new ApplicationRole(role1, desc1, DateTime.Now));
+                await _roleManager.CreateAsync(new ApplicationRole(role, description, DateTime.Now));
             }
-            if (await roleManager.FindByNameAsync(role2) == null)
+        }
+
+        public async Task CreateItems(string email, string role, string username)
+        {
+            if (await _userManager.FindByNameAsync(email) == null)
             {
-                await roleManager.CreateAsync(new ApplicationRole(role2, desc2, DateTime.Now));
+                var user = new ApplicationUser()
+                {
+                    UserName = email
+                };
+
+                var result = await _userManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddPasswordAsync(user, password);
+                    await _userManager.AddToRoleAsync(user, role);
+                }
             }
         }
     }

@@ -25,19 +25,18 @@ namespace SignalRTest.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserLoginDto",
+                name: "UserRegistrationDto",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     username = table.Column<string>(nullable: false),
                     email = table.Column<string>(nullable: false),
-                    password = table.Column<string>(maxLength: 100, nullable: false),
-                    rememberMe = table.Column<bool>(nullable: false)
+                    password = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLoginDto", x => x.Id);
+                    table.PrimaryKey("PK_UserRegistrationDto", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,15 +79,15 @@ namespace SignalRTest.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    userLoginId = table.Column<int>(nullable: true)
+                    UserRegistrationId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_UserLoginDto_userLoginId",
-                        column: x => x.userLoginId,
-                        principalTable: "UserLoginDto",
+                        name: "FK_AspNetUsers_UserRegistrationDto_UserRegistrationId",
+                        column: x => x.UserRegistrationId,
+                        principalTable: "UserRegistrationDto",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -218,9 +217,9 @@ namespace SignalRTest.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_userLoginId",
+                name: "IX_AspNetUsers_UserRegistrationId",
                 table: "AspNetUsers",
-                column: "userLoginId");
+                column: "UserRegistrationId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -247,7 +246,7 @@ namespace SignalRTest.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "UserLoginDto");
+                name: "UserRegistrationDto");
         }
     }
 }

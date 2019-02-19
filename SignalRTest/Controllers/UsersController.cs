@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,22 +48,22 @@ namespace SignalRTest.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(UserLoginDto userLoginDto)
+        public async Task<IActionResult> Register(UserRegistrationDto userRegistrationDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
             
-            var user = new ApplicationUser {UserName = userLoginDto.username, Email = userLoginDto.email};
-            var result = await _userManager.CreateAsync(user, userLoginDto.password);
+            var user = new ApplicationUser {UserName = userRegistrationDto.username, Email = userRegistrationDto.email};
+            var result = await _userManager.CreateAsync(user, userRegistrationDto.password);
 
             if (!result.Succeeded)
             {
-                return NotFound($"Error Creatting user {userLoginDto.username}");
+                return NotFound($"Error Creating user {userRegistrationDto.username}, user may already exist!");
             }
 
-            _logger.LogInformation($"Created new account for user '{userLoginDto.username}'");
+            _logger.LogInformation($"Created new account for user '{userRegistrationDto.username}'");
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -80,7 +79,7 @@ namespace SignalRTest.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-            var userCreatedInDb = _dbContext.IdManagementUsers.Single(x => x.UserName == userLoginDto.username);
+            var userCreatedInDb = _dbContext.IdManagementUsers.Single(x => x.UserName == userRegistrationDto.username);
 
             return Created($"api/Users/{userCreatedInDb.Id}", $"Created user {userCreatedInDb.Id}");
         }
@@ -128,26 +127,34 @@ namespace SignalRTest.Controllers
             {
                 _logger.LogInformation($"User {userLoginDto.username} logged in.");
                 return Ok($"User {userLoginDto.username} logged in.");
-            } else if (result.IsLockedOut)
+            }
+            if (result.IsLockedOut)
             {
                 _logger.LogWarning($"User {userLoginDto.username} has been locked out");
                 return Unauthorized($"User {userLoginDto.username} has been locked out");
             }
-            else if (result.RequiresTwoFactor)
+            if (result.RequiresTwoFactor)
             {
                 _logger.LogWarning($"User {userLoginDto.username} has not set up TwoFactorAuthentication");
                 return Unauthorized($"User {userLoginDto.username} has not set up TwoFactorAuthentication");
             }
-            else if (result.IsNotAllowed)
+            if (result.IsNotAllowed)
             {
                 _logger.LogWarning($"User {userLoginDto.username} is not allowed login. Possible issues: Missing email verification.");
                 return Unauthorized($"User {userLoginDto.username} is not allowed to login. Possible issues: Missing email verification.");
             }
-            else
-            {
-                _logger.LogWarning($"Incorrect password User {userLoginDto.username}");
-                return NotFound($"Incorrect password User {userLoginDto.username}");
-            }
-        } 
+            
+            _logger.LogWarning($"Incorrect password User {userLoginDto.username}");
+            return NotFound($"Incorrect password User {userLoginDto.username}");
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost("banuser/{userId}")]
+        public async Task<IActionResult> BanUser()
+        {
+            // Need to figure out a way to ban users
+            //_userManager.RemoveClaimAsync();
+            return Ok();
+        }
     }
 }

@@ -79,7 +79,7 @@ namespace SignalRTest
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
@@ -136,14 +136,12 @@ namespace SignalRTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDefaultIdentity<ApplicationUser>(config =>
-            {
-                config.SignIn.RequireConfirmedEmail = true;
-                config.SignIn.RequireConfirmedPhoneNumber = false;
-            })
-            .AddDefaultUI(UIFramework.Bootstrap4)
-            //.AddRoles<IdentityRole>()                       // I believe this may add the RoleManager class
-            .AddEntityFrameworkStores<WaterDbContext>();
+
+            services.AddIdentity<ApplicationUser, ApplicationRole>(
+                    options => options.Stores.MaxLengthForKeys = 128)
+                .AddEntityFrameworkStores<WaterDbContext>()
+                .AddDefaultUI()
+                .AddDefaultTokenProviders();
 
             // Change to use Name as the user identifier for SignalR
             // WARNING: This requires that the source of your JWT token 
@@ -189,7 +187,7 @@ namespace SignalRTest
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, WaterDbContext dbContext, RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -211,6 +209,9 @@ namespace SignalRTest
                 routes.MapHub<RequestWaterHub>("/messageHub");
             });
             app.UseMvc();
+
+            var roleCreator = new RoleCreator(dbContext, userManager, roleManager);
+            roleCreator.Initialize().Wait();
         }
     }
 }

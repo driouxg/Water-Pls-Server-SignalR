@@ -31,4 +31,9 @@
     <PackageReference Include="System.Reactive.Runtime.Remoting" Version="4.1.2" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

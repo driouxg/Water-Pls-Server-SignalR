@@ -9,6 +9,6 @@ namespace SignalRTest.Domain
 {
     public class ApplicationUser : IdentityUser
     {
-        public UserLoginDto userLogin {get; set; }
+        public UserRegistrationDto UserRegistration {get; set; }
     }
 }
