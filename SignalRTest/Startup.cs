@@ -26,7 +26,7 @@ namespace SignalRTest
 {
     public class Startup
     {
-        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authnetication")/*Guid.NewGuid().ToByteArray()*/);
+        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authnetication"));
 
         public Startup(IConfiguration configuration)
         {
@@ -45,18 +45,7 @@ namespace SignalRTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc(//config =>
-                //{
-                //
-                //    // using Microsoft.AspNetCore.Mvc.Authorization;
-                //    // using Microsoft.AspNetCore.Authorization;
-                //    var policy = new AuthorizationPolicyBuilder()
-                //        .RequireAuthenticatedUser()
-                //        .Build();
-                //    config.Filters.Add(new AuthorizeFilter(policy));
-                //}
-                )
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSignalR();
 
             // CORS
