@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SignalRTest.DataAccess;
 using SignalRTest.Domain.Dto;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using SignalRTest.Domain;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Text.Encodings.Web;
+using SignalRTest.Domain.Entity;
+using SignalRTest.Services;
 
 namespace SignalRTest.Controllers
 {
@@ -19,21 +19,27 @@ namespace SignalRTest.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly ITokenAuthenticationService _tokenAuthenticationService;
         private readonly WaterDbContext _dbContext;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
 
-        public UsersController(WaterDbContext dbContext, 
-            SignInManager<ApplicationUser> signInManager, 
+        public UsersController(ITokenAuthenticationService tokenAuthenticationService, 
+            WaterDbContext dbContext,
+            SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
             IEmailSender emailSender,
             ILogger<UsersController> logger)
         {
+            _tokenAuthenticationService = tokenAuthenticationService;
             _dbContext = dbContext;
             _signInManager = signInManager;
             _userManager = userManager;
+            _roleManager = roleManager;
             _emailSender = emailSender;
             _logger = logger;
         }
@@ -97,6 +103,8 @@ namespace SignalRTest.Controllers
                 return BadRequest($"Could not find user by id {usersId}");
             }
 
+            await ApplyMemberRoleToUser(user);
+
             var result = await _userManager.ConfirmEmailAsync(user, code);
 
             if (!result.Succeeded)
@@ -108,6 +116,41 @@ namespace SignalRTest.Controllers
             _logger.LogInformation($"Successfully verified email verification token for {usersId}");
 
             return Ok($"Successfully verified email verification token for {usersId}");
+        }
+
+        [HttpPost("get-authentication-token")]
+        public async Task<AuthenticationTokenDto> GetAuthenticationToken(UserLoginDto userLoginDto)
+        {
+            _logger.LogInformation($"REACHED!");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"Invalid login credentials for user {userLoginDto.username}");
+                return new AuthenticationTokenDto
+                {
+                    Token = "Invalid Login Credentials"
+                };
+            }
+
+            _logger.LogInformation($"About to generate token for user {userLoginDto.username}");
+
+            var token = await _tokenAuthenticationService.Authenticate(userLoginDto.username, userLoginDto.password);
+
+            _logger.LogInformation($"Generated token: {token} for user {userLoginDto.username}");
+
+            return new AuthenticationTokenDto
+            {
+                Token = token
+            };
+        }
+
+        public async Task ApplyMemberRoleToUser(ApplicationUser user)
+        {
+            string role = "Member";
+
+            if (await _roleManager.FindByNameAsync(role) != null)
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
         }
 
         [HttpPost("login")]

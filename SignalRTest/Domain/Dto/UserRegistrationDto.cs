@@ -2,7 +2,7 @@
 
 namespace SignalRTest.Domain.Dto
 {
-    public class UserRegistrationDto : Entity.Entity
+    public class UserRegistrationDto : Entity.IEntity
     {
         public int Id { get; protected set; }
         [Required]

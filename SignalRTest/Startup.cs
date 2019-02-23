@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,12 +14,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRTest.Services;
 using SignalRTest.Domain.Entity;
+using SignalRTest.Services.Impl;
 
 namespace SignalRTest
 {
@@ -79,7 +77,7 @@ namespace SignalRTest
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
 
             services.AddAuthentication(options =>
@@ -102,8 +100,8 @@ namespace SignalRTest
                         ValidateAudience = false,
                         ValidateIssuer = false,
                         ValidateActor = false,
-                        ValidateLifetime = true,
-                        IssuerSigningKey = new X509SecurityKey(cert)
+                        ValidateLifetime = true//,
+                        //IssuerSigningKey = new X509SecurityKey(cert)
             };
 
                 // We have to hook the OnMessageReceived event in order to
@@ -114,12 +112,27 @@ namespace SignalRTest
                 {
                     OnMessageReceived = context =>
                     {
-                        var accessToken = context.Request.Query["access_token"];
+                        Console.WriteLine("Attempting to retrieve authToken from request!");
+                        var accessToken = context.Request.Query["authToken"];
+
+                        Console.WriteLine($"Retrieved authToken '{accessToken}' from request");
+
+                        var accessToken1 = context.Request.Query["access_token"];
+
+                        Console.WriteLine($"Also retrieved authToken '{accessToken1}' from request");
+
+                        Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Count);
+                        Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Keys);
+
+                        foreach (var key in context.Request.Query)
+                        {
+                            Console.WriteLine("bloop: " + key.Key + "   val: " + key.Value);
+                        }
 
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hubs/chat")))
+                            (path.StartsWithSegments("/requestWaterHub")))
                         {
                             // Read the token out of the query string
                             context.Token = accessToken;
@@ -149,6 +162,7 @@ namespace SignalRTest
             // If the Name claim isn't unique, users could receive messages 
             // intended for a different user!
             services.AddSingleton<IUserIdProvider, ApplicationUserIdProvider>();    // <----- This originally was services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+            services.AddScoped<ITokenAuthenticationService, TokenAuthenticationService>();  // <---- this is a token generator for Signalr Authorization that I've created and need to add to ASP NET Core DI.
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -178,7 +192,7 @@ namespace SignalRTest
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 options.Cookie.Name = "MySuperDuperCookie";
 
-                options.LoginPath = "/Identity/Account/Login";
+                options.LoginPath = "/api/Users/login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
@@ -206,12 +220,14 @@ namespace SignalRTest
             app.UseCors("CorsPolicy");
             app.UseSignalR(routes =>
             {
-                routes.MapHub<RequestWaterHub>("/messageHub");
+                routes.MapHub<RequestWaterHub>("/requestWaterHub");
+                routes.MapHub<DonateWaterHub>("/donateWaterHub");
             });
-            app.UseMvc();
 
             var roleCreator = new RoleCreator(dbContext, userManager, roleManager);
             roleCreator.Initialize().Wait();
+
+            app.UseMvc();
         }
     }
 }

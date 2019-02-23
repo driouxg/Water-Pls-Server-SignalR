@@ -1,7 +1,8 @@
 ﻿namespace SignalRTest.Domain.Dto
 {
-    public class AddressDto : Entity.Entity
+    public class AddressDto : Entity.IEntity
     {
+        public int Id { get; protected set; }
         public int streetNumber { get; set; }
         public string streetName { get; set; }
         public string route { get; set; }

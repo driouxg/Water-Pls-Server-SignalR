@@ -1,13 +1,10 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Debug;
 using SignalRTest.Domain.VO;
 
 namespace SignalRTest.Services
 {
     public class LocationDistanceCalculator
     {
-        private ILogger _logger;
         private readonly GeoCoordinatesVo location1;
         private readonly GeoCoordinatesVo location2;
 

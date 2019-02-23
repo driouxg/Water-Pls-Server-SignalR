@@ -8,7 +8,6 @@ namespace SignalRTest.Domain
 {
     public class ConnectionMap<T>
     {
-        private readonly ILogger _logger;
         private readonly Dictionary<T, HashSet<string>> _connections;
 
         public ConnectionMap()
@@ -35,7 +34,7 @@ namespace SignalRTest.Domain
                 _connections.Add(key, set);
             } else
             {
-                _logger.LogInformation($"Failed to add {key}:{value} to connectionMap.");
+                //_logger.LogInformation($"Failed to add {key}:{value} to connectionMap.");
             }
         }
 

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SignalRTest.Domain.Entity
+namespace SignalRTest.Domain.Dto
 {
-    public class Entity : IEntity
+    public class AuthenticationTokenDto
     {
-        public int Id { get; protected set; }
+        public string Token { get; set; }
     }
 }

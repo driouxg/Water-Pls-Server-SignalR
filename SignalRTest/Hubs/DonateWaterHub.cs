@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
-using SignalRTest.Domain;
-using SignalRTest.Domain.VO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +14,6 @@ namespace SignalRTest.Hubs
     {
         private WaterDbContext _dbContext;
         private readonly ILogger _logger;
-        private ConnectionMap<UsernameVo> donatorConnections;
 
         public DonateWaterHub(WaterDbContext dbContext, ILogger<DonateWaterHub> logger)
         {
@@ -24,6 +21,9 @@ namespace SignalRTest.Hubs
             _logger = logger;
         }
 
-
+        public async Task SendMessage(string user, string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
+        }
     }
 }
