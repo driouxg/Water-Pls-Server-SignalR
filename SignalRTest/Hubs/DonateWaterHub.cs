@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using SignalRTest.DataAccess;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -18,14 +15,18 @@ namespace SignalRTest.Hubs
     public class DonateWaterHub : Hub
     {
         private readonly ILogger _logger;
+        private readonly IHubContext<RequestWaterHub> _requestHubContext;
         private readonly UserManager<ApplicationUser> _userManager;
-        private ConnectionMap<UsernameVo> donatorConnections;
+        private ConnectionMap<UsernameVo> _donatorConnections;
+        private ConnectionMap<UsernameVo> _requestorConnections;
 
-        public DonateWaterHub(ILogger<DonateWaterHub> logger, UserManager<ApplicationUser> userManager)
+        public DonateWaterHub(ILogger<DonateWaterHub> logger, IHubContext<RequestWaterHub> requestHubContext, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
+            _requestHubContext = requestHubContext;
             _userManager = userManager;
-            donatorConnections = DonatorConnectionSingleton.Instance;
+            _donatorConnections = DonatorConnectionSingleton.Instance;
+            _requestorConnections = RequestorConnectionSingleton.Instance;
         }
 
         public override Task OnConnectedAsync()
@@ -47,19 +48,16 @@ namespace SignalRTest.Hubs
         private void AddUserToConnectionMap(UsernameVo username)
         {
             // Check if user is already existent in connection map
-            bool userExistsInConnectionMap = donatorConnections.ContainsKey(username);
-
-            // Already exists
-            if (userExistsInConnectionMap)
+            if (_donatorConnections.ContainsKey(username))
             {
-                donatorConnections.AddValueToSet(username, Context.ConnectionId);
+                _donatorConnections.AddValueToSet(username, Context.ConnectionId);
             }
             else
             {
-                donatorConnections.Add(username, Context.ConnectionId);
+                _donatorConnections.Add(username, Context.ConnectionId);
             }
 
-            _logger.LogInformation($"Number of users in donatorConnections: {donatorConnections.Count()}");
+            _logger.LogInformation($"Number of users in _donatorConnections: {_donatorConnections.Count()}");
         } 
 
         public override Task OnDisconnectedAsync(Exception exception)
@@ -84,21 +82,40 @@ namespace SignalRTest.Hubs
 
         private void RemoveUserFromConnectionMap(UsernameVo username)
         {
-            if (donatorConnections.ContainsKey(username))
+            if (_donatorConnections.ContainsKey(username))
             {
-                donatorConnections.RemoveValueFromSet(username, Context.ConnectionId);
+                _donatorConnections.RemoveValueFromSet(username, Context.ConnectionId);
                 _logger.LogInformation($"Removed connectionId '{Context.ConnectionId}' for user '{username._value}'");
             }
         }
 
-        public async Task DonateWater(/*string userId*/)
+        public async Task DonateWater()
         {
-            //var user = await _userManager.FindByIdAsync(userId);
+            UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            Console.WriteLine($"Current user is: {Context.User.Identity.Name}");
-            Console.WriteLine();
-            //await Clients.All.SendAsync("ReceiveMessage", user, message);
-            //await Clients.Group("requestors").
+            Console.WriteLine($"Current user is: {username._value}");
+
+            await Groups.AddToGroupAsync(username._value, "donators");
+
+            UsernameVo requestor = new UsernameVo("drybar21");
+
+            while (true)
+            {
+                if (_requestorConnections.ContainsKey(requestor))
+                {
+                    // Get their connection Id(s)
+                    var connectionIds = _requestorConnections.GetValues(requestor);
+
+                    foreach (var connectionId in connectionIds)
+                    {
+                        _logger.LogInformation($"The requestor: drybar21 has requested water, we will now send a message to his connectionId '{connectionId}' him from the donator.");
+                        await _requestHubContext.Clients.Client(connectionId).SendAsync("ReceiveMessage",
+                            $"Donator '{username._value}' has sent you a message!");
+                    }
+
+                    break;
+                }
+            }
         }
     }
 }

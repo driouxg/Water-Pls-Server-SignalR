@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SignalRTest.DataAccess;
@@ -19,26 +20,91 @@ namespace SignalRTest.Hubs
     public class RequestWaterHub : Hub
     {
         private readonly ILogger _logger;
-        private WaterDbContext _dbContext;
-        private ConnectionMap<ApplicationUser> requestorConnections;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private ConnectionMap<UsernameVo> requestorConnections;
+    
 
-        public RequestWaterHub(WaterDbContext dbContext, ILogger<RequestWaterHub> logger)
+        public RequestWaterHub(ILogger<RequestWaterHub> logger, UserManager<ApplicationUser> userManager)
         {
-            _dbContext = dbContext;
             _logger = logger;
+            _userManager = userManager;
             requestorConnections = RequestorConnectionSingleton.Instance;
-        }
-
-        public async Task SendMessage(string user, string message)
-        {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
         public async Task RequestWater()
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, "requestors");
+            UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            _logger.LogInformation($"Added connection '{Context.ConnectionId}' to 'requestors' group.");
+            Console.WriteLine($"Current user is: {username._value}");
+
+            await Groups.AddToGroupAsync(username._value, "requestors");
+
+            _logger.LogInformation($"Added user '{username._value}' to 'requestors' group.");
+
+
+            // Let's try just sending a message to the requestor first
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", "Hi there partner");
+            await Clients.All.SendAsync("ReceiveMessage", "Sending message to all users.");
+        }
+
+        public override Task OnConnectedAsync()
+        {
+            UsernameVo username = GetUsernameVoForCurrentConnection();
+
+            _logger.LogInformation($"User '{username._value}' connected with connectionId '{Context.ConnectionId}'");
+
+            if (username == null)
+            {
+                return base.OnConnectedAsync();
+            }
+
+            AddUserToConnectionMap(username);
+
+            return base.OnConnectedAsync();
+        }
+
+        private void AddUserToConnectionMap(UsernameVo username)
+        {
+            // Check if user is already existent in connection map
+            if (requestorConnections.ContainsKey(username))
+            {
+                requestorConnections.AddValueToSet(username, Context.ConnectionId);
+            }
+            else
+            {
+                requestorConnections.Add(username, Context.ConnectionId);
+            }
+
+            _logger.LogInformation($"Number of users in donatorConnections: {requestorConnections.Count()}");
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            UsernameVo username = GetUsernameVoForCurrentConnection();
+
+            if (username == null)
+            {
+                return base.OnConnectedAsync();
+            }
+
+            RemoveUserFromConnectionMap(username);
+
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        private UsernameVo GetUsernameVoForCurrentConnection()
+        {
+            ApplicationUser user = _userManager.FindByIdAsync(Context.User.Identity.Name).Result;
+            return new UsernameVo(user.UserName);
+        }
+
+        private void RemoveUserFromConnectionMap(UsernameVo username)
+        {
+            if (requestorConnections.ContainsKey(username))
+            {
+                requestorConnections.RemoveValueFromSet(username, Context.ConnectionId);
+                _logger.LogInformation($"Removed connectionId '{Context.ConnectionId}' for user '{username._value}'");
+            }
         }
 
         //public async Task RequestWater(string username)
@@ -63,7 +129,7 @@ namespace SignalRTest.Hubs
         //    //    var closestDonator = FindClosestDonator(requestorUsername);
         //    //
         //    //    // Message the donator and requestor that their matches have been found
-        //    //    HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValue(requestorUsername);
+        //    //    HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValues(requestorUsername);
         //    //    //foreach (string donatorString in donatorConnectionStrings)
         //    //    //{
         //    //    //    Clients.User()

@@ -1,14 +1,15 @@
 ﻿using SignalRTest.Domain;
 using System;
+using SignalRTest.Domain.VO;
 
 namespace SignalRTest.Singleton
 {
     public class RequestorConnectionSingleton
     {
-        private static readonly Lazy<ConnectionMap<ApplicationUser>> lazy =
-        new Lazy<ConnectionMap<ApplicationUser>>(() => new ConnectionMap<ApplicationUser>());
+        private static readonly Lazy<ConnectionMap<UsernameVo>> lazy =
+        new Lazy<ConnectionMap<UsernameVo>>(() => new ConnectionMap<UsernameVo>());
 
-        public static ConnectionMap<ApplicationUser> Instance { get { return lazy.Value; } }
+        public static ConnectionMap<UsernameVo> Instance { get { return lazy.Value; } }
 
         private RequestorConnectionSingleton()
         {
