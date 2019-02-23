@@ -75,19 +75,19 @@ namespace SignalRTest.Hubs
         //    //}
         //}
 
-        private UserDto FindClosestDonator(ApplicationUser requestorName)
-        {
-            // Get the donator hub singleton
-            ConnectionMap<ApplicationUser> donatorConnectionMap = DonatorConnectionSingleton.Instance;
-
-            _logger.LogInformation($"Find closest donator to {requestorName}. Searching through {donatorConnectionMap.Count()} active donators.");
-
-            ICollection<UserDto> vals = RetrieveConnectedDonators(donatorConnectionMap.Keys());
-
-            UserDto result = QueryRequestorByName(requestorName);
-
-            return FindTheClosestDonator(result, vals);
-        }
+        //private UserDto FindClosestDonator(ApplicationUser requestorName)
+        //{
+        //    // Get the donator hub singleton
+        //    ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
+        //
+        //    _logger.LogInformation($"Find closest donator to {requestorName}. Searching through {donatorConnectionMap.Count()} active donators.");
+        //
+        //    ICollection<UsernameVo> vals = RetrieveConnectedDonators(donatorConnectionMap.Keys());
+        //
+        //    UserDto result = QueryRequestorByName(requestorName);
+        //
+        //    return FindTheClosestDonator(result, vals);
+        //}
 
         private UserDto QueryRequestorByName(ApplicationUser usernameVo)
         {

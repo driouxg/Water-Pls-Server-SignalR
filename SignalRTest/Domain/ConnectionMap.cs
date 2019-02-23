@@ -29,7 +29,7 @@ namespace SignalRTest.Domain
 
         public void Add(T key, string value)
         {
-            if (!ContainsKey(key))
+            if (ContainsKey(key))
             {
                 //_logger.LogWarning($"Connection map already contains key '{key}'");
                 return;
@@ -50,7 +50,7 @@ namespace SignalRTest.Domain
                 return;
             }
 
-            var values = GetValue(key);
+            var values = GetValues(key);
 
             if (!ContainsValue(values, value))
             {
@@ -65,6 +65,23 @@ namespace SignalRTest.Domain
         public void Remove(T key)
         {
             _connections.Remove(key);
+        }
+
+        public void RemoveValueFromSet(T key, string value)
+        {
+            if (!ContainsKey(key))
+            {
+                return;
+            }
+
+            var values = GetValues(key);
+
+            if (!ContainsValue(values, value))
+            {
+                return;
+            }
+
+            values.Remove(value);
         }
 
         public bool ContainsKey(T key)
@@ -92,7 +109,7 @@ namespace SignalRTest.Domain
             return _connections.Keys;
         }
 
-        public HashSet<string> GetValue(T key)
+        public HashSet<string> GetValues(T key)
         {
             return _connections[key];
         }

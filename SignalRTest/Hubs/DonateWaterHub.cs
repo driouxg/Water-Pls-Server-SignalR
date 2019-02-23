@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using SignalRTest.Domain;
+using SignalRTest.Domain.VO;
 using SignalRTest.Singleton;
 
 namespace SignalRTest.Hubs
@@ -16,14 +17,12 @@ namespace SignalRTest.Hubs
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class DonateWaterHub : Hub
     {
-        private WaterDbContext _dbContext;
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private ConnectionMap<ApplicationUser> donatorConnections;
+        private ConnectionMap<UsernameVo> donatorConnections;
 
-        public DonateWaterHub(WaterDbContext dbContext, ILogger<DonateWaterHub> logger, UserManager<ApplicationUser> userManager)
+        public DonateWaterHub(ILogger<DonateWaterHub> logger, UserManager<ApplicationUser> userManager)
         {
-            _dbContext = dbContext;
             _logger = logger;
             _userManager = userManager;
             donatorConnections = DonatorConnectionSingleton.Instance;
@@ -31,46 +30,65 @@ namespace SignalRTest.Hubs
 
         public override Task OnConnectedAsync()
         {
-            // Get user from DB
-            var user = _userManager.FindByIdAsync(Context.User.Identity.Name);
+            UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            _logger.LogInformation($"User's user ID: {user.Id} and user's username: {user.Result.UserName}");
+            _logger.LogInformation($"User's username: {username._value}");
 
-            if (user == null)
+            if (username == null)
             {
                 return base.OnConnectedAsync();
             }
 
+            AddUserToConnectionMap(username);
+
+            return base.OnConnectedAsync();
+        }
+
+        private void AddUserToConnectionMap(UsernameVo username)
+        {
             // Check if user is already existent in connection map
-            bool userExistsInConnectionMap = donatorConnections.ContainsKey(user.Result);
+            bool userExistsInConnectionMap = donatorConnections.ContainsKey(username);
 
             // Already exists
             if (userExistsInConnectionMap)
             {
-                donatorConnections.AddValueToSet(user.Result, Context.ConnectionId);
+                donatorConnections.AddValueToSet(username, Context.ConnectionId);
             }
-
-            // Doesn't exist
-            if (!userExistsInConnectionMap)
+            else
             {
-                donatorConnections.Add(user.Result, Context.ConnectionId);
+                donatorConnections.Add(username, Context.ConnectionId);
             }
 
-            _logger.LogInformation($"User already exists in connection map: {userExistsInConnectionMap}");
-
-            //donatorConnections.Add(nullUser, Context.ConnectionId);
-            return base.OnConnectedAsync();
-        }
-
-        //private 
+            _logger.LogInformation($"Number of users in donatorConnections: {donatorConnections.Count()}");
+        } 
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var user = Context.User.Identity.Name;
+            UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            //_logger.LogWarning($"User with connectionId: {}");
-            //UserHandler.ConnectedIds.Remove(Context.ConnectionId);
+            if (username == null)
+            {
+                return base.OnConnectedAsync();
+            }
+
+            RemoveUserFromConnectionMap(username);
+
             return base.OnDisconnectedAsync(exception);
+        }
+
+        private UsernameVo GetUsernameVoForCurrentConnection()
+        {
+            ApplicationUser user = _userManager.FindByIdAsync(Context.User.Identity.Name).Result;
+            return new UsernameVo(user.UserName);
+        }
+
+        private void RemoveUserFromConnectionMap(UsernameVo username)
+        {
+            if (donatorConnections.ContainsKey(username))
+            {
+                donatorConnections.RemoveValueFromSet(username, Context.ConnectionId);
+                _logger.LogInformation($"Removed connectionId '{Context.ConnectionId}' for user '{username._value}'");
+            }
         }
 
         public async Task DonateWater(/*string userId*/)
