@@ -14,8 +14,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Logging;
 using SignalRTest.Services;
 using SignalRTest.Domain.Entity;
 using SignalRTest.Services.Impl;
@@ -24,6 +26,8 @@ namespace SignalRTest
 {
     public class Startup
     {
+        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authnetication")/*Guid.NewGuid().ToByteArray()*/);
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -70,16 +74,13 @@ namespace SignalRTest
             services.AddDbContext<WaterDbContext>
                 (options => options.UseSqlServer(connection));
 
-            // requires
-            // using Microsoft.AspNetCore.Identity.UI.Services;
-            // using WebPWrecover.Services;
             services.AddSingleton<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("C:\\Users\\drioux.guidry\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
+            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
                                                                                                X509KeyStorageFlags.PersistKeySet);
-
+            IdentityModelEventSource.ShowPII = true;
             services.AddAuthentication(options =>
             {
                 // Identity made Cookie authentication the default.
@@ -100,8 +101,8 @@ namespace SignalRTest
                         ValidateAudience = false,
                         ValidateIssuer = false,
                         ValidateActor = false,
-                        ValidateLifetime = true//,
-                        //IssuerSigningKey = new X509SecurityKey(cert)
+                        ValidateLifetime = true,
+                        IssuerSigningKey = SecurityKey
             };
 
                 // We have to hook the OnMessageReceived event in order to
@@ -113,13 +114,13 @@ namespace SignalRTest
                     OnMessageReceived = context =>
                     {
                         Console.WriteLine("Attempting to retrieve authToken from request!");
-                        var accessToken = context.Request.Query["authToken"];
+                        //var accessToken = context.Request.Body.ToString();
+                        //
+                        //Console.WriteLine($"Retrieved authToken '{accessToken}' from request");
 
-                        Console.WriteLine($"Retrieved authToken '{accessToken}' from request");
+                        var accessToken = context.Request.Query["access_token"];
 
-                        var accessToken1 = context.Request.Query["access_token"];
-
-                        Console.WriteLine($"Also retrieved authToken '{accessToken1}' from request");
+                        Console.WriteLine($"Also retrieved authToken '{accessToken}' from request");
 
                         Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Count);
                         Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Keys);
