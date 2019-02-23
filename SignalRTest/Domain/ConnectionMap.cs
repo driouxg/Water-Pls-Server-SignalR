@@ -8,10 +8,12 @@ namespace SignalRTest.Domain
 {
     public class ConnectionMap<T>
     {
+        //private readonly ILogger<ConnectionMap<T>> _logger;
         private readonly Dictionary<T, HashSet<string>> _connections;
 
-        public ConnectionMap()
+        public ConnectionMap(/*ILogger<ConnectionMap<T>> logger*/)
         {
+            //_logger = logger;
             _connections = new Dictionary<T, HashSet<string>>();
         }
 
@@ -27,15 +29,37 @@ namespace SignalRTest.Domain
 
         public void Add(T key, string value)
         {
-            if (ContainsKey(key))
+            if (!ContainsKey(key))
             {
-                var set = new HashSet<string>();
-                set.Add(value);
-                _connections.Add(key, set);
-            } else
-            {
-                //_logger.LogInformation($"Failed to add {key}:{value} to connectionMap.");
+                //_logger.LogWarning($"Connection map already contains key '{key}'");
+                return;
             }
+
+            var set = new HashSet<string>
+            {
+                value
+            };
+            _connections.Add(key, set);
+        }
+
+        public void AddValueToSet(T key, string value)
+        {
+            if (!ContainsKey(key))
+            {
+                //_logger.LogWarning($"Connection map does not contain key '{key}'");
+                return;
+            }
+
+            var values = GetValue(key);
+
+            if (!ContainsValue(values, value))
+            {
+                //_logger.LogWarning($"Connection map's values at key '{key}' already contain value '{value}'");
+                return;
+            }
+
+            //_logger.LogInformation($"Added connectionId '{value}' to set.");
+            values.Add(value);
         }
 
         public void Remove(T key)
@@ -48,9 +72,14 @@ namespace SignalRTest.Domain
             return _connections.ContainsKey(key);
         }
 
-        public bool ContainsValue(HashSet<string> value)
+        public bool ContainsValueSet(HashSet<string> value)
         {
             return _connections.ContainsValue(value);
+        }
+
+        public bool ContainsValue(HashSet<string> values, string value)
+        {
+            return values.Contains(value);
         }
 
         public ICollection<HashSet<string>> Values()

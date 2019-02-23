@@ -20,13 +20,13 @@ namespace SignalRTest.Hubs
     {
         private readonly ILogger _logger;
         private WaterDbContext _dbContext;
-        //private ConnectionMap<UsernameVo> requestorConnections;
+        private ConnectionMap<ApplicationUser> requestorConnections;
 
         public RequestWaterHub(WaterDbContext dbContext, ILogger<RequestWaterHub> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
-            //requestorConnections = RequestorConnectionSingleton.Instance;
+            requestorConnections = RequestorConnectionSingleton.Instance;
         }
 
         public async Task SendMessage(string user, string message)
@@ -41,44 +41,44 @@ namespace SignalRTest.Hubs
             _logger.LogInformation($"Added connection '{Context.ConnectionId}' to 'requestors' group.");
         }
 
-        public async Task RequestWater(string username)
-        {
-            // Convert to Value Object
-            Domain.VO.ApplicationUser requestorUsername = new Domain.VO.ApplicationUser(username);
+        //public async Task RequestWater(string username)
+        //{
+        //    //// Convert to Value Object
+        //    //ApplicationUser requestorUsername = new ApplicationUser(username);
+        //
+        //    //if (UserExists(requestorUsername))
+        //    //{
+        //    //    // Add to requestor set
+        //    //    requestorConnections.Add(requestorUsername, Context.ConnectionId);
+        //    //
+        //    //    // Get current client connection
+        //    //    var connectionId = Context.ConnectionId;
+        //    //
+        //    //    //Context.User.
+        //    //
+        //    //    // Get current user's coordinates
+        //    //    GetUserCoordinates(requestorUsername);
+        //    //
+        //    //    // Find the closest donator to the current requestor
+        //    //    var closestDonator = FindClosestDonator(requestorUsername);
+        //    //
+        //    //    // Message the donator and requestor that their matches have been found
+        //    //    HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValue(requestorUsername);
+        //    //    //foreach (string donatorString in donatorConnectionStrings)
+        //    //    //{
+        //    //    //    Clients.User()
+        //    //    //}
+        //    //}
+        //    //else
+        //    //{
+        //    //    _logger.LogInformation("Username: 'username' does not exist in database.");
+        //    //}
+        //}
 
-            if (UserExists(requestorUsername))
-            {
-                // Add to requestor set
-                requestorConnections.Add(requestorUsername, Context.ConnectionId);
-
-                // Get current client connection
-                var connectionId = Context.ConnectionId;
-
-                //Context.User.
-
-                // Get current user's coordinates
-                GetUserCoordinates(requestorUsername);
-
-                // Find the closest donator to the current requestor
-                var closestDonator = FindClosestDonator(requestorUsername);
-
-                // Message the donator and requestor that their matches have been found
-                HashSet<string> donatorConnectionStrings = DonatorConnectionSingleton.Instance.GetValue(requestorUsername);
-                //foreach (string donatorString in donatorConnectionStrings)
-                //{
-                //    Clients.User()
-                //}
-            }
-            else
-            {
-                _logger.LogInformation("Username: 'username' does not exist in database.");
-            }
-        }
-
-        private UserDto FindClosestDonator(Domain.VO.ApplicationUser requestorName)
+        private UserDto FindClosestDonator(ApplicationUser requestorName)
         {
             // Get the donator hub singleton
-            ConnectionMap<Domain.VO.ApplicationUser> donatorConnectionMap = DonatorConnectionSingleton.Instance;
+            ConnectionMap<ApplicationUser> donatorConnectionMap = DonatorConnectionSingleton.Instance;
 
             _logger.LogInformation($"Find closest donator to {requestorName}. Searching through {donatorConnectionMap.Count()} active donators.");
 
@@ -89,7 +89,7 @@ namespace SignalRTest.Hubs
             return FindTheClosestDonator(result, vals);
         }
 
-        private UserDto QueryRequestorByName(Domain.VO.ApplicationUser usernameVo)
+        private UserDto QueryRequestorByName(ApplicationUser usernameVo)
         {
             return null;//_dbContext.Users.Single(i => i.Username == usernameVo.value);
         }
@@ -117,7 +117,7 @@ namespace SignalRTest.Hubs
             return closestDonator;
         }
 
-        private ICollection<UserDto> RetrieveConnectedDonators(ICollection<Domain.VO.ApplicationUser> donators)
+        private ICollection<UserDto> RetrieveConnectedDonators(ICollection<ApplicationUser> donators)
         {
             return null;
             //return _dbContext.Users.Where(
@@ -125,13 +125,13 @@ namespace SignalRTest.Hubs
             //).ToList();
         }
 
-        private GeoCoordinatesVo GetUserCoordinates(Domain.VO.ApplicationUser usernameVo)
+        private GeoCoordinatesVo GetUserCoordinates(ApplicationUser usernameVo)
         {
             //var userDto = _dbContext.Users.Single(x => x.Username == usernameVo.value);
             return null; //new GeoCoordinatesVo(userDto.geoCoordinatesDto);
         }
 
-        private bool UserExists(Domain.VO.ApplicationUser username)
+        private bool UserExists(ApplicationUser username)
         {
             return false; //_dbContext.Users.Single(x => x.Username == username.value) != null;
         }

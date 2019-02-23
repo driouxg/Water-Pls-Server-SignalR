@@ -13,7 +13,6 @@ using SignalRTest.Domain;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -26,7 +25,7 @@ namespace SignalRTest
 {
     public class Startup
     {
-        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authnetication"));
+        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authentication"));
 
         public Startup(IConfiguration configuration)
         {
@@ -66,9 +65,6 @@ namespace SignalRTest
             services.AddSingleton<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
-            // Creating signing certificate for JWT
-            X509Certificate2 cert = new X509Certificate2("K:\\Users\\drioux\\Desktop\\certificate\\powershellcert.pfx", "password1234", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet |
-                                                                                               X509KeyStorageFlags.PersistKeySet);
             IdentityModelEventSource.ShowPII = true;
             services.AddAuthentication(options =>
             {
