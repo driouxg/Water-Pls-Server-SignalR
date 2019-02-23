@@ -6,10 +6,10 @@ namespace SignalRTest.Singleton
 {
     public class RequestorConnectionSingleton
     {
-        private static readonly Lazy<ConnectionMap<UsernameVo>> lazy =
-        new Lazy<ConnectionMap<UsernameVo>>(() => new ConnectionMap<UsernameVo>());
+        private static readonly Lazy<ConnectionMap<Domain.VO.ApplicationUser>> lazy =
+        new Lazy<ConnectionMap<Domain.VO.ApplicationUser>>(() => new ConnectionMap<Domain.VO.ApplicationUser>());
 
-        public static ConnectionMap<UsernameVo> Instance { get { return lazy.Value; } }
+        public static ConnectionMap<Domain.VO.ApplicationUser> Instance { get { return lazy.Value; } }
 
         private RequestorConnectionSingleton()
         {

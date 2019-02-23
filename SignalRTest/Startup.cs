@@ -102,27 +102,14 @@ namespace SignalRTest
                 {
                     OnMessageReceived = context =>
                     {
-                        Console.WriteLine("Attempting to retrieve authToken from request!");
-                        //var accessToken = context.Request.Body.ToString();
-                        //
-                        //Console.WriteLine($"Retrieved authToken '{accessToken}' from request");
-
                         var accessToken = context.Request.Query["access_token"];
-
-                        Console.WriteLine($"Also retrieved authToken '{accessToken}' from request");
-
-                        Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Count);
-                        Console.WriteLine("Printing the Query count itself: " + context.Request.Query.Keys);
-
-                        foreach (var key in context.Request.Query)
-                        {
-                            Console.WriteLine("bloop: " + key.Key + "   val: " + key.Value);
-                        }
 
                         // If the request is for our hub...
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/requestWaterHub")))
+                            ((path.StartsWithSegments("/requestWaterHub") ||
+                            path.StartsWithSegments("/donateWaterHub"))
+                            ))
                         {
                             // Read the token out of the query string
                             context.Token = accessToken;

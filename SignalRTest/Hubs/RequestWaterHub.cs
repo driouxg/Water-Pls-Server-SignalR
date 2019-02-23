@@ -20,13 +20,13 @@ namespace SignalRTest.Hubs
     {
         private readonly ILogger _logger;
         private WaterDbContext _dbContext;
-        private ConnectionMap<UsernameVo> requestorConnections;
+        //private ConnectionMap<UsernameVo> requestorConnections;
 
         public RequestWaterHub(WaterDbContext dbContext, ILogger<RequestWaterHub> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
-            requestorConnections = RequestorConnectionSingleton.Instance;
+            //requestorConnections = RequestorConnectionSingleton.Instance;
         }
 
         public async Task SendMessage(string user, string message)
@@ -34,10 +34,17 @@ namespace SignalRTest.Hubs
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
+        public async Task RequestWater()
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "requestors");
+
+            _logger.LogInformation($"Added connection '{Context.ConnectionId}' to 'requestors' group.");
+        }
+
         public async Task RequestWater(string username)
         {
             // Convert to Value Object
-            UsernameVo requestorUsername = new UsernameVo(username);
+            Domain.VO.ApplicationUser requestorUsername = new Domain.VO.ApplicationUser(username);
 
             if (UserExists(requestorUsername))
             {
@@ -68,10 +75,10 @@ namespace SignalRTest.Hubs
             }
         }
 
-        private UserDto FindClosestDonator(UsernameVo requestorName)
+        private UserDto FindClosestDonator(Domain.VO.ApplicationUser requestorName)
         {
             // Get the donator hub singleton
-            ConnectionMap<UsernameVo> donatorConnectionMap = DonatorConnectionSingleton.Instance;
+            ConnectionMap<Domain.VO.ApplicationUser> donatorConnectionMap = DonatorConnectionSingleton.Instance;
 
             _logger.LogInformation($"Find closest donator to {requestorName}. Searching through {donatorConnectionMap.Count()} active donators.");
 
@@ -82,7 +89,7 @@ namespace SignalRTest.Hubs
             return FindTheClosestDonator(result, vals);
         }
 
-        private UserDto QueryRequestorByName(UsernameVo usernameVo)
+        private UserDto QueryRequestorByName(Domain.VO.ApplicationUser usernameVo)
         {
             return null;//_dbContext.Users.Single(i => i.Username == usernameVo.value);
         }
@@ -110,7 +117,7 @@ namespace SignalRTest.Hubs
             return closestDonator;
         }
 
-        private ICollection<UserDto> RetrieveConnectedDonators(ICollection<UsernameVo> donators)
+        private ICollection<UserDto> RetrieveConnectedDonators(ICollection<Domain.VO.ApplicationUser> donators)
         {
             return null;
             //return _dbContext.Users.Where(
@@ -118,13 +125,13 @@ namespace SignalRTest.Hubs
             //).ToList();
         }
 
-        private GeoCoordinatesVo GetUserCoordinates(UsernameVo usernameVo)
+        private GeoCoordinatesVo GetUserCoordinates(Domain.VO.ApplicationUser usernameVo)
         {
             //var userDto = _dbContext.Users.Single(x => x.Username == usernameVo.value);
             return null; //new GeoCoordinatesVo(userDto.geoCoordinatesDto);
         }
 
-        private bool UserExists(UsernameVo username)
+        private bool UserExists(Domain.VO.ApplicationUser username)
         {
             return false; //_dbContext.Users.Single(x => x.Username == username.value) != null;
         }

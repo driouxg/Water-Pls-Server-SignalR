@@ -21,9 +21,22 @@ namespace SignalRTest.Hubs
             _logger = logger;
         }
 
-        public async Task SendMessage(string user, string message)
+        public override Task OnConnected()
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            UserHandler.ConnectedIds.Add(Context.ConnectionId);
+            return base.OnConnected();
+        }
+
+        public override Task OnDisconnected()
+        {
+            UserHandler.ConnectedIds.Remove(Context.ConnectionId);
+            return base.OnDisconnected();
+        }
+
+        public async Task DonateWater()
+        {
+            //await Clients.All.SendAsync("ReceiveMessage", user, message);
+            await Clients.Group("requestors").
         }
     }
 }
