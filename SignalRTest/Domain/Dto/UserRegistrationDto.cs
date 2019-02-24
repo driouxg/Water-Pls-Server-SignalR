@@ -4,7 +4,6 @@ namespace SignalRTest.Domain.Dto
 {
     public class UserRegistrationDto
     {
-        public int Id { get; protected set; }
         [Required]
         public string username { get; set; }
         [Required]

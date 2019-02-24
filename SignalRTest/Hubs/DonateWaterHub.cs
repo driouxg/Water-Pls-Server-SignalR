@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using SignalRTest.Domain;
+using SignalRTest.Domain.Dto;
 using SignalRTest.Domain.VO;
 using SignalRTest.Singleton;
 
@@ -89,33 +90,48 @@ namespace SignalRTest.Hubs
             }
         }
 
+        public async Task Hello(GeoCoordinatesDto message)
+        {
+            _logger.LogInformation($"Received message back from client '{message.latitude}' -----------------");
+
+
+        }
+
+        public async Task GetListOfCandidates()
+        {
+
+        }
+
+        public async Task DonateWaterToRequestor()
+        {
+
+        }
+
         public async Task DonateWater()
         {
             UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            Console.WriteLine($"Current user is: {username._value}");
-
+            _logger.LogInformation($"User '{username._value}' is looking for requestors in need of water.");
             await Groups.AddToGroupAsync(username._value, "donators");
 
             UsernameVo requestor = new UsernameVo("drybar21");
 
-            while (true)
+            if (_requestorConnections.ContainsKey(requestor))
             {
-                if (_requestorConnections.ContainsKey(requestor))
+                _logger.LogInformation($"Sending message to requestor '{requestor}'s connections.");
+
+                // Get their connection Id(s)
+                var connectionIds = _requestorConnections.GetValues(requestor);
+
+                foreach (var connectionId in connectionIds)
                 {
-                    // Get their connection Id(s)
-                    var connectionIds = _requestorConnections.GetValues(requestor);
-
-                    foreach (var connectionId in connectionIds)
-                    {
-                        _logger.LogInformation($"The requestor: drybar21 has requested water, we will now send a message to his connectionId '{connectionId}' him from the donator.");
-                        await _requestHubContext.Clients.Client(connectionId).SendAsync("ReceiveMessage",
-                            $"Donator '{username._value}' has sent you a message!");
-                    }
-
-                    break;
+                    _logger.LogInformation($"The requestor: drybar21 has requested water, we will now send a message to his connectionId '{connectionId}' him from the donator.");
+                    await _requestHubContext.Clients.Client(connectionId).SendAsync("ReceiveMessage",
+                        $"Donator '{username._value}' has sent you a message!");
                 }
             }
+
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", "Hello from server.");
         }
     }
 }

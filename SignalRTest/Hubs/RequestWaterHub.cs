@@ -40,11 +40,6 @@ namespace SignalRTest.Hubs
             await Groups.AddToGroupAsync(username._value, "requestors");
 
             _logger.LogInformation($"Added user '{username._value}' to 'requestors' group.");
-
-
-            // Let's try just sending a message to the requestor first
-            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", "Hi there partner");
-            await Clients.All.SendAsync("ReceiveMessage", "Sending message to all users.");
         }
 
         public override Task OnConnectedAsync()
