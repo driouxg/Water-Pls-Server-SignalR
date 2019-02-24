@@ -130,8 +130,6 @@ namespace SignalRTest.Hubs
                         $"Donator '{username._value}' has sent you a message!");
                 }
             }
-
-            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", "Hello from server.");
         }
     }
 }
