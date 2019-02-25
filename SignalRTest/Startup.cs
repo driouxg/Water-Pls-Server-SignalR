@@ -166,7 +166,7 @@ namespace SignalRTest
                 options.Cookie.Name = "MySuperDuperCookie";
 
                 options.LoginPath = "/api/Users/login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.AccessDeniedPath = "/api/not-found";
                 options.SlidingExpiration = true;
             });
             // End of ASP.NET Core 2.2 Authorization and Identity

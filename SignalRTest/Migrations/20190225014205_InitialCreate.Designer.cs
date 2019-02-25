@@ -10,7 +10,7 @@ using SignalRTest.DataAccess;
 namespace SignalRTest.Migrations
 {
     [DbContext(typeof(WaterDbContext))]
-    [Migration("20190219045021_InitialCreate")]
+    [Migration("20190225014205_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,7 +149,7 @@ namespace SignalRTest.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<int?>("UserRegistrationId");
+                    b.Property<int?>("geoCoordinatesId");
 
                     b.HasKey("Id");
 
@@ -161,30 +161,9 @@ namespace SignalRTest.Migrations
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("UserRegistrationId");
+                    b.HasIndex("geoCoordinatesId");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.Dto.UserRegistrationDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("email")
-                        .IsRequired();
-
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasMaxLength(100);
-
-                    b.Property<string>("username")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserRegistrationDto");
                 });
 
             modelBuilder.Entity("SignalRTest.Domain.Entity.ApplicationRole", b =>
@@ -213,6 +192,21 @@ namespace SignalRTest.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("SignalRTest.Domain.Entity.GeoCoordinatesEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("latitude");
+
+                    b.Property<string>("longitude");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GeoCoordinatesEntity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -262,9 +256,9 @@ namespace SignalRTest.Migrations
 
             modelBuilder.Entity("SignalRTest.Domain.ApplicationUser", b =>
                 {
-                    b.HasOne("SignalRTest.Domain.Dto.UserRegistrationDto", "UserRegistration")
+                    b.HasOne("SignalRTest.Domain.Entity.GeoCoordinatesEntity", "geoCoordinates")
                         .WithMany()
-                        .HasForeignKey("UserRegistrationId");
+                        .HasForeignKey("geoCoordinatesId");
                 });
 #pragma warning restore 612, 618
         }

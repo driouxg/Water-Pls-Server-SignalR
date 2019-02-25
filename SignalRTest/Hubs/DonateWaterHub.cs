@@ -99,12 +99,26 @@ namespace SignalRTest.Hubs
 
         public async Task GetListOfCandidates()
         {
+            // Let's just return all requestor connections right now to the donator client.
+            var requestorNames = _requestorConnections.Keys();
 
+            foreach (var requestorName in requestorNames)
+            {
+                _logger.LogInformation($"Sending donator candidate '{requestorName}'s information.");
+                await Clients.Clients(Context.ConnectionId).SendAsync("ListCandidates", requestorName);
+            }
+
+            _logger.LogInformation($"Sent donator all connected requestors.");
         }
 
         public async Task DonateWaterToRequestor()
         {
 
+        }
+
+        public async Task UpdateDonatorLocation(GeoCoordinatesDto geoCoordinates)
+        {
+            //_userManager.
         }
 
         public async Task DonateWater()

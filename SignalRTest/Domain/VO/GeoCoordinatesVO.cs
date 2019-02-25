@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SignalRTest.Domain.Dto;
+﻿using SignalRTest.Domain.Dto;
 
 namespace SignalRTest.Domain.VO
 {
@@ -15,6 +11,12 @@ namespace SignalRTest.Domain.VO
         {
             this.latitude = latitude;
             this.longitude = longitude;
+        }
+
+        public GeoCoordinatesVo(float latitude, float longitude)
+        {
+            this.latitude = new GeoCoordinateVo(latitude);
+            this.longitude = new GeoCoordinateVo(longitude);
         }
 
         public GeoCoordinatesVo(GeoCoordinatesDto geoCoordinatesDto)

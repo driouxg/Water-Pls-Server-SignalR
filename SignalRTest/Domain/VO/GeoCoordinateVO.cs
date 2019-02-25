@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SignalRTest.Domain.VO;
 
 namespace SignalRTest.Domain.Dto
 {
     public class GeoCoordinateVo : ValueObject
     {
-        public double value { get; }
+        public float value { get; }
 
-        public GeoCoordinateVo(double value)
+        public GeoCoordinateVo(float value)
         {
             this.value = value;
             validateGeoCoordinate();

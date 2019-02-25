@@ -25,18 +25,17 @@ namespace SignalRTest.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRegistrationDto",
+                name: "GeoCoordinatesEntity",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    username = table.Column<string>(nullable: false),
-                    email = table.Column<string>(nullable: false),
-                    password = table.Column<string>(maxLength: 100, nullable: false)
+                    latitude = table.Column<string>(nullable: true),
+                    longitude = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRegistrationDto", x => x.Id);
+                    table.PrimaryKey("PK_GeoCoordinatesEntity", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,15 +78,15 @@ namespace SignalRTest.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    UserRegistrationId = table.Column<int>(nullable: true)
+                    geoCoordinatesId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_UserRegistrationDto_UserRegistrationId",
-                        column: x => x.UserRegistrationId,
-                        principalTable: "UserRegistrationDto",
+                        name: "FK_AspNetUsers_GeoCoordinatesEntity_geoCoordinatesId",
+                        column: x => x.geoCoordinatesId,
+                        principalTable: "GeoCoordinatesEntity",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -217,9 +216,9 @@ namespace SignalRTest.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_UserRegistrationId",
+                name: "IX_AspNetUsers_geoCoordinatesId",
                 table: "AspNetUsers",
-                column: "UserRegistrationId");
+                column: "geoCoordinatesId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -246,7 +245,7 @@ namespace SignalRTest.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "UserRegistrationDto");
+                name: "GeoCoordinatesEntity");
         }
     }
 }

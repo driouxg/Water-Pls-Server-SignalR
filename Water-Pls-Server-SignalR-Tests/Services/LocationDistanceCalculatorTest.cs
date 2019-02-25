@@ -14,12 +14,12 @@ namespace Water_Pls_Server_SignalR_Tests
         public void CalculateDistance()
         {
             // Arrange
-            GeoCoordinateVo latitude1 = new GeoCoordinateVo(51.5);
+            GeoCoordinateVo latitude1 = new GeoCoordinateVo(51.5f);
             GeoCoordinateVo longitude1 = new GeoCoordinateVo(0);
             GeoCoordinatesVo coordinates1 = new GeoCoordinatesVo(latitude1, longitude1);
 
-            GeoCoordinateVo latitude2 = new GeoCoordinateVo(38.8);
-            GeoCoordinateVo longitude2 = new GeoCoordinateVo(-77.1);
+            GeoCoordinateVo latitude2 = new GeoCoordinateVo(38.8f);
+            GeoCoordinateVo longitude2 = new GeoCoordinateVo(-77.1f);
             GeoCoordinatesVo coordinates2 = new GeoCoordinatesVo(latitude2, longitude2);
 
             LocationDistanceCalculator calculator = new LocationDistanceCalculator(coordinates1, coordinates2);

@@ -2,7 +2,13 @@
 {
     public class GeoCoordinatesDto
     {
-        public double latitude { get; set; }
-        public double longitude { get; set; }
+        public float latitude { get; set; }
+        public float longitude { get; set; }
+
+        public GeoCoordinatesDto(float latitude, float longitude)
+        {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
     }
 }
