@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using SignalRTest.DataAccess;
 using SignalRTest.Domain;
 using SignalRTest.Domain.Dto;
 using SignalRTest.Domain.VO;
@@ -21,7 +19,7 @@ namespace SignalRTest.Hubs
     {
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private ConnectionMap<UsernameVo> requestorConnections;
+        private readonly ConnectionMap<UsernameVo> requestorConnections;
     
 
         public RequestWaterHub(ILogger<RequestWaterHub> logger, UserManager<ApplicationUser> userManager)
@@ -35,7 +33,7 @@ namespace SignalRTest.Hubs
         {
             UsernameVo username = GetUsernameVoForCurrentConnection();
 
-            Console.WriteLine($"Current user is: {username._value}");
+            Console.WriteLine($"Current requestor user is: {username._value}");
 
             await Groups.AddToGroupAsync(username._value, "requestors");
 
