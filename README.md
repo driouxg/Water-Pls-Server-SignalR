@@ -13,6 +13,15 @@ Done? | Task
 - SendGrid
     * We use SendGrid to handle all of the dirty work involving making sure automatic emails being sent out are safe and secure. Therefore, we must set a secret key that is used to send emails through SendGrid using our organization account. Follow [this guide](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-2.2&tabs=netcore-cli) to get things setup.
 
+# Get Started Locally
+
+    1. Clone the repository.
+    2. Create some locally hosted mysql database.
+    3. Create environment variables:
+        1. APPLICATION_USERS_DB with a value of a db connection string, Ex. <Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=False;ConnectRetryCount=0;>.
+        2. JWT_SIGNING_KEY with a string value of at least 32 characters.
+	
+
 # How To:
 
 ### Update Database Schema
@@ -36,16 +45,8 @@ Found Via Official [MS Docs](https://docs.microsoft.com/en-us/sql/database-engin
     6. Restart the Database Engine.
 
 
-### Create Self Signed Certificate
 
-- [Official MS Docs](https://docs.microsoft.com/en-us/powershell/module/pkiclient/new-selfsignedcertificate?view=win10-ps)
-- [Article](https://medium.com/the-new-control-plane/generating-self-signed-certificates-on-windows-7812a600c2d8)
-
-    Enter Command(s):
-    1. $cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname company.co.nz
-    2. $pwd = ConvertTo-SecureString -String ‘password1234’ -Force -AsPlainText
-    3. $path = ‘cert:\localMachine\my\’ + $cert.thumbprint
-    4. Export-PfxCertificate -cert $path -FilePath c:\enteryourdesireddirectoryhere\certificate\powershellcert.pfx -Password $pwd
+	
 
 ## Notes on Design Decisions
 

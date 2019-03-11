@@ -25,14 +25,18 @@ namespace SignalRTest
 {
     public class Startup
     {
-        public static readonly SymmetricSecurityKey SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authentication"));
+        public IConfiguration Configuration { get; set; }
+        public IHostingEnvironment Environment { get; set; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+            Environment = env;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -57,10 +61,9 @@ namespace SignalRTest
                     .AllowCredentials();
             }));
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=WaterPlsDb;Trusted_Connection=True;ConnectRetryCount=0";
 
             services.AddDbContext<WaterDbContext>
-                (options => options.UseSqlServer(connection));
+                (options => options.UseSqlServer(Configuration["APPLICATION_USERS_DB"]));
 
             services.AddSingleton<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
@@ -87,7 +90,7 @@ namespace SignalRTest
                         ValidateIssuer = false,
                         ValidateActor = false,
                         ValidateLifetime = true,
-                        IssuerSigningKey = SecurityKey
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["JWT_SIGNING_KEY"]))
             };
 
                 // We have to hook the OnMessageReceived event in order to
