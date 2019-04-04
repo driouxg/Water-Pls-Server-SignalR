@@ -80,7 +80,11 @@ namespace Water_Pls_Server_SignalR_Tests
                     streetNumber = 15464,
                     zipcode = 85394
                 },
-                geoCoordinatesDto = new GeoCoordinatesDto(12.234f, 3124.23423f)
+                geoCoordinatesDto = new GeoCoordinatesDto()
+                {
+                    latitude = 12.234f,
+                    longitude = 3124.23423f
+                }
             };
         }
 

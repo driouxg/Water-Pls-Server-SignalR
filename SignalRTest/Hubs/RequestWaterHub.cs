@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using SignalRTest.DataAccess;
 using SignalRTest.Domain;
 using SignalRTest.Domain.Dto;
+using SignalRTest.Domain.Entity;
 using SignalRTest.Domain.VO;
 using SignalRTest.Services;
 using SignalRTest.Singleton;
@@ -20,10 +23,11 @@ namespace SignalRTest.Hubs
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ConnectionMap<UsernameVo> requestorConnections;
-    
+        private readonly WaterDbContext _dbContext;
 
-        public RequestWaterHub(ILogger<RequestWaterHub> logger, UserManager<ApplicationUser> userManager)
+        public RequestWaterHub(WaterDbContext dbContext, ILogger<RequestWaterHub> logger, UserManager<ApplicationUser> userManager)
         {
+            _dbContext = dbContext;
             _logger = logger;
             _userManager = userManager;
             requestorConnections = RequestorConnectionSingleton.Instance;
@@ -54,6 +58,18 @@ namespace SignalRTest.Hubs
             AddUserToConnectionMap(username);
 
             return base.OnConnectedAsync();
+        }
+
+        public async Task UpdateLocation(UserGeoCoordinatesDto userGeoCoordinates)
+        {
+            GeoCoordinatesEntity entity = new GeoCoordinatesEntity()
+            {
+                Username = userGeoCoordinates.Username.Username,
+                latitude = userGeoCoordinates.GeoCoordinates.latitude,
+                longitude = userGeoCoordinates.GeoCoordinates.longitude
+            };
+
+            _dbContext.GeoCoordinates.Update(entity);
         }
 
         private void AddUserToConnectionMap(UsernameVo username)

@@ -7,6 +7,7 @@ Done? | Task
 ⬜️ | Add register, login, ban, and delete operations to users controller.
 ⬜️ | Find out how to mock UserManager class to be able to test controller methods.
 ⬜️ | Remove user from donatorConnectionMap if already exists in requestorConnectionMap.
+⬜️ | Add re-authenticate token service that allows user to pass valid, but expired token back to server to have another one recreated for them.
 
 
 # Dependencies
@@ -27,8 +28,8 @@ Done? | Task
 ### Update Database Schema
         1. Navigate to: ../water-pls-server-signalr/signalrtest
         2. Enter command(s):
-            1. dotnet ef migrations add <Enter-A-Migration-Commit-Message-Here>
-            2. dotnet ef database update 
+            1. dotnet ef migrations add <Enter-A-Migration-Commit-Message-Here> --context InsertDbContextNameHere
+            2. dotnet ef database update --context InsertNameOfDbContextHere
 
 ### Boot Up SQL Server 2017 Locally
 

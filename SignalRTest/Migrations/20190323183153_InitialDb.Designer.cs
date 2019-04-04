@@ -10,8 +10,8 @@ using SignalRTest.DataAccess;
 namespace SignalRTest.Migrations
 {
     [DbContext(typeof(WaterDbContext))]
-    [Migration("20190225014205_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20190323183153_InitialDb")]
+    partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -149,8 +149,6 @@ namespace SignalRTest.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.Property<int?>("geoCoordinatesId");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -160,8 +158,6 @@ namespace SignalRTest.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("geoCoordinatesId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -192,21 +188,6 @@ namespace SignalRTest.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.Entity.GeoCoordinatesEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("latitude");
-
-                    b.Property<string>("longitude");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GeoCoordinatesEntity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -252,13 +233,6 @@ namespace SignalRTest.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SignalRTest.Domain.ApplicationUser", b =>
-                {
-                    b.HasOne("SignalRTest.Domain.Entity.GeoCoordinatesEntity", "geoCoordinates")
-                        .WithMany()
-                        .HasForeignKey("geoCoordinatesId");
                 });
 #pragma warning restore 612, 618
         }

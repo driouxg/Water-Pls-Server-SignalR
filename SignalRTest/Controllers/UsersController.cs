@@ -19,7 +19,7 @@ namespace SignalRTest.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ITokenAuthenticationService _tokenAuthenticationService;
+        private readonly ITokenManagerService _tokenManagerService;
         private readonly WaterDbContext _dbContext;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -27,7 +27,7 @@ namespace SignalRTest.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
 
-        public UsersController(ITokenAuthenticationService tokenAuthenticationService, 
+        public UsersController(ITokenManagerService tokenManagerService, 
             WaterDbContext dbContext,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
@@ -35,7 +35,7 @@ namespace SignalRTest.Controllers
             IEmailSender emailSender,
             ILogger<UsersController> logger)
         {
-            _tokenAuthenticationService = tokenAuthenticationService;
+            _tokenManagerService = tokenManagerService;
             _dbContext = dbContext;
             _signInManager = signInManager;
             _userManager = userManager;
@@ -85,7 +85,7 @@ namespace SignalRTest.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-            var userCreatedInDb = _dbContext.IdManagementUsers.Single(x => x.UserName == userRegistrationDto.username);
+            var userCreatedInDb = _userManager.FindByNameAsync(userRegistrationDto.username);
 
             return Created($"api/Users/{userCreatedInDb.Id}", $"Created user {userCreatedInDb.Id}");
         }
@@ -118,31 +118,6 @@ namespace SignalRTest.Controllers
             return Ok($"Successfully verified email verification token for {usersId}");
         }
 
-        [HttpPost("get-authentication-token")]
-        public async Task<AuthenticationTokenDto> GetAuthenticationToken(UserLoginDto userLoginDto)
-        {
-            _logger.LogInformation($"REACHED!");
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning($"Invalid login credentials for user {userLoginDto.username}");
-                return new AuthenticationTokenDto
-                {
-                    Token = "Invalid Login Credentials"
-                };
-            }
-
-            _logger.LogInformation($"About to generate token for user {userLoginDto.username}");
-
-            var token = await _tokenAuthenticationService.Authenticate(userLoginDto.username, userLoginDto.password);
-
-            _logger.LogInformation($"Generated token: {token} for user {userLoginDto.username}");
-
-            return new AuthenticationTokenDto
-            {
-                Token = token
-            };
-        }
-
         public async Task ApplyMemberRoleToUser(ApplicationUser user)
         {
             string role = "Member";
@@ -158,11 +133,8 @@ namespace SignalRTest.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
-
-            // Clear the existing external cookie to ensure a clean login process
-            //await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var result = await _signInManager.PasswordSignInAsync(userLoginDto.username, userLoginDto.password, userLoginDto.rememberMe, lockoutOnFailure: true);
 
@@ -198,6 +170,13 @@ namespace SignalRTest.Controllers
             // Need to figure out a way to ban users
             //_userManager.RemoveClaimAsync();
             return Ok();
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("heythere")]
+        public async Task<IActionResult> HeyThere()
+        {
+            return Ok("You are an admin!");
         }
     }
 }
