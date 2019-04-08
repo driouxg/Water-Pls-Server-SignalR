@@ -15,7 +15,7 @@ pool:
 
 # Here are our build variables, whereas we can store more secret keys in the pipeline variables.
 variables:
-  dockerId: $(dockerId)  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
+  dockerId: driouxg  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
   imageName: water-pls-docker  # Replace with the name of the image you want to publish
 
 steps:
