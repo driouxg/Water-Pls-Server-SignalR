@@ -15,16 +15,13 @@ pool:
 
 # Here are our build variables, whereas we can store more secret keys in the pipeline variables.
 variables:
-  dockerId: driouxg  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
-  imageName: water-pls-docker  # Replace with the name of the image you want to publish
+  dockerId: $env:dockerId    # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
+  imageName: $env:imageName  # Replace with the name of the image you want to publish
 
 steps:
 ## Deploy the application
 - script: |
     dotnet build -t $(dockerId)/$(imageName) .
-    docker login -u $(dockerId) -p $(pswd)
+    docker login -u $(dockerId) -p $env:dockerPassword
     docker push $(dockerId)/$(imageName)
-  env:
-    pswd: $(dockerPassword)  # Define dockerPassword in the Variables tab of this pipeline in Pipelines page of web interface
-
  
