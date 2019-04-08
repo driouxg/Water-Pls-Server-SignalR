@@ -21,7 +21,7 @@ variables:
 steps:
 ## Deploy the application
 - script: |
-    dotnet build -t $(dockerId)/$(imageName) .
+    docker build -t $(dockerId)/$(imageName) .
     docker login -u $(dockerId) -p $env:pswd
     docker push $(dockerId)/$(imageName)
   env:
