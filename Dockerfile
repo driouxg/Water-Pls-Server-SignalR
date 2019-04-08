@@ -1,22 +1,18 @@
 # First stage of multi-stage build
-#FROM microsoft/aspnetcore-build AS build-env
-FROM microsoft/dotnet:2.2-sdk
+# Example from: https://docs.docker.com/engine/examples/dotnetcore/
+FROM microsoft/dotnet:2.2-sdk AS build-env
 WORKDIR /app
 
-# copy the contents of agent working directory on host to workdir in container
-#COPY . ./
+# Copy csproj and restore as distinct layers
 COPY *.csproj ./
 RUN dotnet restore
 
-# dotnet commands to build, test, and publish
-# RUN dotnet restore
-# RUN dotnet build -c Release
-# RUN dotnet publish -c Release -o out
-
-# Second stage - Build runtime image
-#FROM microsoft/aspnetcore
-#WORKDIR /app
-#COPY --from=build-env /app/out .
+# Copy everything else and build
 COPY . ./
 RUN dotnet publish -c Release -o out
-ENTRYPOINT ["dotnet", "out/water-pls-server.dll"]
+
+# Build runtime image
+FROM microsoft/dotnet:aspnetcore-runtime
+WORKDIR /app
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet", "water-pls-server.dll"]
