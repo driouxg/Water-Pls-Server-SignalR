@@ -4,7 +4,7 @@ FROM microsoft/dotnet:2.2-sdk AS build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY *.csproj ./SignalRTest/
+COPY *.csproj ./
 RUN dotnet restore
 
 # Copy everything else and build
