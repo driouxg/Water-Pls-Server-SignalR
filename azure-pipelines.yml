@@ -22,11 +22,7 @@ steps:
 ## Deploy the application
 - script: |
     docker build -t $(dockerId)/$(imageName) .
-    echo $DOCKER_PASSWORD
-    echo $TEST_VARIABLE
     docker login -u $(dockerId) -p $DOCKER_PASSWORD
-    docker push $(dockerId)/$(imageName):server
+    docker push $(dockerId)/$(imageName)
   env:
-    DOCKER_PASSWORD: $(dockerPassword)
-    MY_PIPELINE_VAR: $(TEST_VARIABLE)
- 
+    DOCKER_PASSWORD: $(dockerPassword) 
