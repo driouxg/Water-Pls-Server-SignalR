@@ -1,5 +1,7 @@
 # First stage of multi-stage build
 # Example from: https://docs.docker.com/engine/examples/dotnetcore/
+
+# Dockerfile cheat sheet: https://kapeli.com/cheat_sheets/Dockerfile.docset/Contents/Resources/Documents/index
 FROM microsoft/dotnet:2.2-sdk AS build-env
 WORKDIR /app
 
