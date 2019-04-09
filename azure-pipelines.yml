@@ -22,7 +22,8 @@ steps:
 ## Deploy the application
 - script: |
     docker build -t $(dockerId)/$(imageName) .
-    docker login -u $(dockerId) -p $env:pswd registry.hub.docker.com/$(dockerId)/$(imageName)
+    docker logout
+    docker login -u $(dockerId) -p $env:pswd
     docker push $(dockerId)/$(imageName):server
   env:
     pswd: $(dockerPassword)
