@@ -22,8 +22,8 @@ steps:
 ## Deploy the application
 - script: |
     docker build -t $(dockerId)/$(imageName) .
-    echo $env:pswd
-    docker login -u $(dockerId) -p $env:pswd
+    echo $env:dockerPassword
+    docker login -u $(dockerId) -p $env:dockerPassword
     docker push $(dockerId)/$(imageName):server
   env:
     pswd: $(dockerPassword)
