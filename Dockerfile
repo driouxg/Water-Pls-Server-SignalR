@@ -2,7 +2,8 @@
 # Example from: https://docs.docker.com/engine/examples/dotnetcore/
 
 # Dockerfile cheat sheet: https://kapeli.com/cheat_sheets/Dockerfile.docset/Contents/Resources/Documents/index
-FROM microsoft/dotnet:2.2-sdk AS build-env
+#FROM microsoft/dotnet:2.2-sdk AS build-env
+FROM microsoft/dotnet:2.2-sdk
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
