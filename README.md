@@ -1,4 +1,5 @@
 [![Build Status](https://dtguidry-sundevils.visualstudio.com/Water Pls/_apis/build/status/Water%20Pls-CI?branchName=master)](https://dtguidry-sundevils.visualstudio.com/Water Pls/_build/latest?definitionId=2&branchName=master)
+
 # Tasks
 
 Done? | Task
