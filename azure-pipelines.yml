@@ -22,9 +22,9 @@ steps:
 ## Deploy the application
 - script: |
     docker build -t $(dockerId)/$(imageName) .
-    echo $env:DOCKER_PASSWORD
+    echo $DOCKER_PASSWORD
     echo $TEST_VARIABLE
-    docker login -u $(dockerId) -p $env:DOCKER_PASSWORD
+    docker login -u $(dockerId) -p $DOCKER_PASSWORD
     docker push $(dockerId)/$(imageName):server
   env:
     DOCKER_PASSWORD: $(dockerPassword)
