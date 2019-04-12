@@ -17,6 +17,8 @@ pool:
 variables:
   dockerId: driouxg    # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
   imageName: water-pls-docker  # Replace with the name of the image you want to publish
+  kubernetesCluster: dryoxCluster
+  azureResourceGroup: dryoxResourceGroup
 
 steps:
 ## Deploy the application
@@ -25,4 +27,18 @@ steps:
     docker login -u $(dockerId) -p $DOCKER_PASSWORD
     docker push $(dockerId)/$(imageName)
   env:
-    DOCKER_PASSWORD: $(dockerPassword) 
+    DOCKER_PASSWORD: $(dockerPassword)
+
+# Run a deployment using our Kubernetes Service, with our deplyoment file.
+- task: Kubernetes@1
+  displayName: kubectl apply using configFile
+  inputs:
+    connectionType: Azure Resource Manager
+    azureSubscriptionEndpoint: $AZURE_SUBSCRIPTION_ENDPOINT
+    azureResourceGroup: $(azureResourceGroup)
+    kubernetesCluster: $(kubernetesCluster)
+    command: apply
+    useConfigurationFile: true
+    configuration: deployment-server.yaml
+  env:
+    AZURE_SUBSCRIPTION_ENDPOINT: $(azureSubscriptionEndpoint)
