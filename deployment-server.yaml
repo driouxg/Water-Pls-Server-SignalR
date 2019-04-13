@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-server
+  labels:
+    app: backend-server
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-server
+  template:
+    metadata:
+      labels:
+        app: backend-server
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: water-pls-docker
+        image: cloud.docker.com/u/driouxg/repository/docker/driouxg/water-pls-docker
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
