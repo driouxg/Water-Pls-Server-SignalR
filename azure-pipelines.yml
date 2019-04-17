@@ -35,7 +35,7 @@ steps:
   inputs:
     connectionType: Azure Resource Manager
     #azureSubscriptionEndpoint: $AZURE_SUBSCRIPTION_ENDPOINT
-    azureSubscriptionEndpoint: dryoxclust-dryoxresourcegro-03d9d0-1cd2489b.hcp.westus.azmk8s.io
+    azureSubscriptionEndpoint: 03d9d03e-fc16-4145-b3a2-ca74f740b95b
     azureResourceGroup: $(azureResourceGroup)
     kubernetesCluster: $(kubernetesCluster)
     command: apply
