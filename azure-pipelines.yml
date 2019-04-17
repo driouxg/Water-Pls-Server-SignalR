@@ -34,7 +34,8 @@ steps:
   displayName: kubectl apply using configFile
   inputs:
     connectionType: Azure Resource Manager
-    azureSubscriptionEndpoint: $AZURE_SUBSCRIPTION_ENDPOINT
+    #azureSubscriptionEndpoint: $AZURE_SUBSCRIPTION_ENDPOINT
+    azureSubscriptionEndpoint: /subscriptions/03d9d03e-fc16-4145-b3a2-ca74f740b95b
     azureResourceGroup: $(azureResourceGroup)
     kubernetesCluster: $(kubernetesCluster)
     command: apply
