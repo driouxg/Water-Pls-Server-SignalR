@@ -34,12 +34,12 @@ steps:
   displayName: kubectl apply using configFile
   inputs:
     connectionType: Azure Resource Manager
-    #azureSubscriptionEndpoint: $AZURE_SUBSCRIPTION_ENDPOINT
     azureSubscriptionEndpoint: 'dryoxResourceManager'
     azureResourceGroup: $(azureResourceGroup)
     kubernetesCluster: $(kubernetesCluster)
     command: apply
-    useConfigurationFile: true
-    configuration: deployment-server.yaml
+    arguments: -f deployment-server.yaml
+    #useConfigurationFile: true
+    #configuration: deployment-server.yaml
   env:
     AZURE_SUBSCRIPTION_ENDPOINT: $(azureSubscriptionEndpoint)
