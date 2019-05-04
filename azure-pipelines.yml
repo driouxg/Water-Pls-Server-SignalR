@@ -38,8 +38,8 @@ steps:
     azureResourceGroup: $(azureResourceGroup)
     kubernetesCluster: $(kubernetesCluster)
     command: apply
-    arguments: -f deployment-server.yaml
-    #useConfigurationFile: true
-    #configuration: deployment-server.yaml
+    #arguments: -f deployment-server.yaml
+    useConfigurationFile: true
+    configuration: deployment-server.yaml
   env:
     AZURE_SUBSCRIPTION_ENDPOINT: $(azureSubscriptionEndpoint)
