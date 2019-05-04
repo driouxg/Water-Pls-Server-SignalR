@@ -19,4 +19,4 @@ spec:
         image: cloud.docker.com/u/driouxg/repository/docker/driouxg/water-pls-docker
         imagePullPolicy: Always
         ports:
-      - containerPort: 8080
+        - containerPort: 8080
