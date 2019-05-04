@@ -4,7 +4,7 @@ metadata:
   name: backend-server
   labels:
     app: backend-server
-spec: 
+spec:
   replicas: 1
   selector:
     matchLabels:
@@ -14,11 +14,9 @@ spec:
       labels:
         app: backend-server
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
-        - name: water-pls-docker
+      - name: water-pls-docker
         image: cloud.docker.com/u/driouxg/repository/docker/driouxg/water-pls-docker
         imagePullPolicy: Always
         ports:
-          - containerPort: 8080
+      - containerPort: 8080
