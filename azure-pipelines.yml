@@ -29,9 +29,20 @@ steps:
   env:
     DOCKER_PASSWORD: $(dockerPassword)
 
+# Create docker secret
+- task: Kubernetes@1
+  displayName: Create Docker Secret for Image pulled
+  inputs:
+    connectionType: Azure Resource Manager
+    azureSubscriptionEndpoint: 'dryoxResourceGroup'
+    azureResourceGroup: $(azureResourceGroup)
+    kubernetesCluster: $(kubernetesCluster)
+    command: create
+    arguments: secret docker-registry regcred --docker-server=$(env:dockerRegistryServer) --docker-username=$(env:dockerUsername) --docker-password=$(env:dockerPassword) --docker-email=$(env:dockerEmail)
+
 # Run a deployment using our Kubernetes Service, with our deplyoment file.
 - task: Kubernetes@1
-  displayName: kubectl apply using configFile
+  displayName: kubectl apply using Kubernetes Deployment File
   inputs:
     connectionType: Azure Resource Manager
     azureSubscriptionEndpoint: 'dryoxResourceManager'
